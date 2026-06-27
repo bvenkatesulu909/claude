@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sheep Farm Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f0;
+    color: #1a2e1a;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #2d5a27 0%, #4a8c3f 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+  .header-icon { font-size: 56px; }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px 20px;
+    border-left: 5px solid;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::after {
+    content: attr(data-icon);
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 36px;
+    opacity: 0.12;
+  }
+  .kpi-card.total { border-color: #4a8c3f; }
+  .kpi-card.healthy { border-color: #22c55e; }
+  .kpi-card.ill { border-color: #ef4444; }
+  .kpi-card.delivery { border-color: #f59e0b; }
+  .kpi-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: #6b7280; font-weight: 600; }
+  .kpi-value { font-size: 38px; font-weight: 800; margin: 6px 0 2px; line-height: 1; }
+  .kpi-card.total .kpi-value { color: #2d5a27; }
+  .kpi-card.healthy .kpi-value { color: #16a34a; }
+  .kpi-card.ill .kpi-value { color: #dc2626; }
+  .kpi-card.delivery .kpi-value { color: #d97706; }
+  .kpi-sub { font-size: 13px; color: #9ca3af; }
+
+  /* ROW 2 */
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #374151;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title span { font-size: 18px; }
+
+  /* DONUT CHART */
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut-svg { flex-shrink: 0; }
+  .legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: #374151; font-weight: 500; }
+  .legend-val { color: #6b7280; margin-left: auto; padding-left: 8px; }
+
+  /* BAR CHART */
+  .bar-group { margin-bottom: 14px; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; color: #374151; font-weight: 500; }
+  .bar-track { background: #f3f4f6; border-radius: 6px; height: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+
+  /* ILLNESS TABLE */
+  .illness-table { width: 100%; border-collapse: collapse; }
+  .illness-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: #9ca3af; padding: 0 0 10px; border-bottom: 1px solid #f3f4f6; }
+  .illness-table td { padding: 10px 0; border-bottom: 1px solid #f9fafb; font-size: 13px; vertical-align: middle; }
+  .illness-table tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill.high { background: #fee2e2; color: #dc2626; }
+  .pill.med { background: #fef3c7; color: #d97706; }
+  .pill.low { background: #dcfce7; color: #16a34a; }
+
+  /* ALERT */
+  .alert {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #92400e;
+  }
+  .alert-icon { font-size: 22px; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1>🐑 Flock Management Dashboard</h1>
+    <p>Statistical &amp; Analytical Report &nbsp;·&nbsp; Total Flock: 1,000 Sheep &nbsp;·&nbsp; As of June 2026</p>
+  </div>
+  <div class="header-icon">🌿</div>
+</div>
+
+<!-- ALERT -->
+<div class="alert">
+  <div class="alert-icon">⚠️</div>
+  <div><strong>Action Required:</strong> 47 sheep showing signs of illness require immediate veterinary attention. Foot rot and pneumonia cases up 12% this month.</div>
+</div>
+
+<!-- KPI CARDS -->
+<div class="kpi-grid">
+  <div class="kpi-card total" data-icon="🐑">
+    <div class="kpi-label">Total Flock</div>
+    <div class="kpi-value">1,000</div>
+    <div class="kpi-sub">All categories combined</div>
+  </div>
+  <div class="kpi-card healthy" data-icon="💚">
+    <div class="kpi-label">Healthy Sheep</div>
+    <div class="kpi-value">836</div>
+    <div class="kpi-sub">83.6% of total flock</div>
+  </div>
+  <div class="kpi-card ill" data-icon="🏥">
+    <div class="kpi-label">Ill / At Risk</div>
+    <div class="kpi-value">164</div>
+    <div class="kpi-sub">16.4% require attention</div>
+  </div>
+  <div class="kpi-card delivery" data-icon="🍼">
+    <div class="kpi-label">Ready to Deliver</div>
+    <div class="kpi-value">89</div>
+    <div class="kpi-sub">Expected within 2 weeks</div>
+  </div>
+</div>
+
+<!-- ROW 2 -->
+<div class="row2">
+
+  <!-- FLOCK COMPOSITION DONUT -->
+  <div class="card">
+    <div class="card-title"><span>📊</span> Flock Composition</div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="150" height="150" viewBox="0 0 150 150">
+        <circle cx="75" cy="75" r="55" fill="none" stroke="#e5e7eb" stroke-width="22"/>
+        <circle cx="75" cy="75" r="55" fill="none" stroke="#4a8c3f" stroke-width="22"
+          stroke-dasharray="219.9 628.3" stroke-dashoffset="157.1" transform="rotate(-90 75 75)"/>
+        <circle cx="75" cy="75" r="55" fill="none" stroke="#1e40af" stroke-width="22"
+          stroke-dasharray="81.7 628.3" stroke-dashoffset="-62.8" transform="rotate(-90 75 75)"/>
+        <circle cx="75" cy="75" r="55" fill="none" stroke="#f59e0b" stroke-width="22"
+          stroke-dasharray="93 628.3" stroke-dashoffset="-144.5" transform="rotate(-90 75 75)"/>
+        <circle cx="75" cy="75" r="55" fill="none" stroke="#a78bfa" stroke-width="22"
+          stroke-dasharray="64.1 628.3" stroke-dashoffset="-237.5" transform="rotate(-90 75 75)"/>
+        <text x="75" y="70" text-anchor="middle" font-size="22" font-weight="800" fill="#2d5a27">1,000</text>
+        <text x="75" y="87" text-anchor="middle" font-size="10" fill="#9ca3af">sheep</text>
+      </svg>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#4a8c3f"></div>
+          <span class="legend-name">Ewes (adult females)</span>
+          <span class="legend-val">620 &nbsp;<span style="color:#4a8c3f;font-weight:700">62%</span></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#1e40af"></div>
+          <span class="legend-name">Rams (adult males)</span>
+          <span class="legend-val">130 &nbsp;<span style="color:#1e40af;font-weight:700">13%</span></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f59e0b"></div>
+          <span class="legend-name">Ewe lambs</span>
+          <span class="legend-val">148 &nbsp;<span style="color:#f59e0b;font-weight:700">14.8%</span></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#a78bfa"></div>
+          <span class="legend-name">Ram lambs</span>
+          <span class="legend-val">102 &nbsp;<span style="color:#a78bfa;font-weight:700">10.2%</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEALTH STATUS BAR -->
+  <div class="card">
+    <div class="card-title"><span>🏥</span> Health Status Breakdown</div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Excellent Health</span><span style="color:#16a34a;font-weight:700">412 (41.2%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:41.2%;background:#16a34a"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Good Health</span><span style="color:#4a8c3f;font-weight:700">287 (28.7%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:28.7%;background:#4a8c3f"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Needs Monitoring</span><span style="color:#f59e0b;font-weight:700">117 (11.7%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:11.7%;background:#f59e0b"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Mild Illness</span><span style="color:#f97316;font-weight:700">101 (10.1%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:10.1%;background:#f97316"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Serious Illness</span><span style="color:#dc2626;font-weight:700">47 (4.7%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:4.7%;background:#dc2626"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Critical / Quarantine</span><span style="color:#7f1d1d;font-weight:700">16 (1.6%)</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:1.6%;background:#7f1d1d"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW 3 -->
+<div class="row3">
+
+  <!-- ILLNESS TYPES -->
+  <div class="card">
+    <div class="card-title"><span>🦠</span> Illness Types</div>
+    <table class="illness-table">
+      <thead>
+        <tr>
+          <th>Condition</th>
+          <th>Count</th>
+          <th>Severity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Foot Rot</td><td><strong>52</strong></td><td><span class="pill high">High</span></td></tr>
+        <tr><td>Pneumonia</td><td><strong>38</strong></td><td><span class="pill high">High</span></td></tr>
+        <tr><td>Internal Parasites</td><td><strong>31</strong></td><td><span class="pill med">Med</span></td></tr>
+        <tr><td>Pink Eye</td><td><strong>19</strong></td><td><span class="pill med">Med</span></td></tr>
+        <tr><td>Skin Conditions</td><td><strong>14</strong></td><td><span class="pill low">Low</span></td></tr>
+        <tr><td>Other / TBD</td><td><strong>10</strong></td><td><span class="pill med">Med</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DELIVERY STATUS -->
+  <div class="card">
+    <div class="card-title"><span>🍼</span> Pregnancy &amp; Delivery</div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Ready to deliver (&le;2 wks)</span><span style="color:#f59e0b;font-weight:700">89</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:62%;background:#f59e0b"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Late pregnancy (2&ndash;4 wks)</span><span style="color:#a78bfa;font-weight:700">143</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%;background:#a78bfa"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Mid pregnancy</span><span style="color:#60a5fa;font-weight:700">112</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:78%;background:#60a5fa"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Early pregnancy</span><span style="color:#34d399;font-weight:700">78</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:55%;background:#34d399"></div></div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-label"><span>Not pregnant (ewes)</span><span style="color:#9ca3af;font-weight:700">198</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%;background:#e5e7eb"></div></div>
+    </div>
+    <div style="background:#fffbeb;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-top:8px">
+      📌 <strong>Total pregnant ewes: 422</strong> out of 620 ewes (68.1% conception rate)
+    </div>
+  </div>
+
+  <!-- LAMBS & RAMS -->
+  <div class="card">
+    <div class="card-title"><span>🐏</span> Lambs &amp; Rams Detail</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:#eff6ff;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:#1e40af;font-weight:700;margin-bottom:4px">Adult Rams</div>
+        <div style="font-size:32px;font-weight:800;color:#1e40af">130</div>
+        <div style="font-size:11px;color:#6b7280">13% of flock</div>
+      </div>
+      <div style="background:#faf5ff;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:#7c3aed;font-weight:700;margin-bottom:4px">Ram Lambs</div>
+        <div style="font-size:32px;font-weight:800;color:#7c3aed">102</div>
+        <div style="font-size:11px;color:#6b7280">10.2% of flock</div>
+      </div>
+      <div style="background:#fefce8;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:#a16207;font-weight:700;margin-bottom:4px">Ewe Lambs</div>
+        <div style="font-size:32px;font-weight:800;color:#a16207">148</div>
+        <div style="font-size:11px;color:#6b7280">14.8% of flock</div>
+      </div>
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:#166534;font-weight:700;margin-bottom:4px">Total Lambs</div>
+        <div style="font-size:32px;font-weight:800;color:#166534">250</div>
+        <div style="font-size:11px;color:#6b7280">25% of flock</div>
+      </div>
+    </div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:10px 14px;font-size:12px;color:#166534;">
+      🐑 Lamb-to-ewe ratio: <strong>0.40</strong> &nbsp;·&nbsp; Ram-to-ewe ratio: <strong>1:4.8</strong>
+    </div>
+  </div>
+
+</div>
+
+<!-- MONTHLY DELIVERY FORECAST -->
+<div class="card" style="margin-bottom:24px">
+  <div class="card-title"><span>📅</span> Monthly Delivery Forecast (Next 6 Months)</div>
+  <div style="display:flex;align-items:flex-end;gap:12px;height:140px;padding-top:10px">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:12px;font-weight:700;color:#f59e0b">89</div>
+      <div style="width:100%;background:#f59e0b;border-radius:6px 6px 0 0;height:100px"></div>
+      <div style="font-size:11px;color:#6b7280">Jul</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:12px;font-weight:700;color:#a78bfa">143</div>
+      <div style="width:100%;background:#a78bfa;border-radius:6px 6px 0 0;height:120px"></div>
+      <div style="font-size:11px;color:#6b7280">Aug</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:12px;font-weight:700;color:#60a5fa">112</div>
+      <div style="width:100%;background:#60a5fa;border-radius:6px 6px 0 0;height:90px"></div>
+      <div style="font-size:11px;color:#6b7280">Sep</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:12px;font-weight:700;color:#34d399">78</div>
+      <div style="width:100%;background:#34d399;border-radius:6px 6px 0 0;height:65px"></div>
+      <div style="font-size:11px;color:#6b7280">Oct</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:12px;font-weight:700;color:#9ca3af">~45</div>
+      <div style="width:100%;background:#e5e7eb;border-radius:6px 6px 0 0;height:38px"></div>
+      <div style="font-size:11px;color:#6b7280">Nov</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:12px;font-weight:700;color:#9ca3af">~28</div>
+      <div style="width:100%;background:#e5e7eb;border-radius:6px 6px 0 0;height:24px"></div>
+      <div style="font-size:11px;color:#6b7280">Dec</div>
+    </div>
+  </div>
+  <div style="font-size:11px;color:#9ca3af;margin-top:10px">* Nov–Dec are projections based on current pregnancy stage data</div>
+</div>
+
+<!-- SUMMARY STATS ROW -->
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px">
+  <div style="background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;font-weight:600">Health Rate</div>
+    <div style="font-size:28px;font-weight:800;color:#16a34a;margin:4px 0">83.6%</div>
+    <div style="font-size:11px;color:#9ca3af">Above avg (80%)</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;font-weight:600">Conception Rate</div>
+    <div style="font-size:28px;font-weight:800;color:#a78bfa;margin:4px 0">68.1%</div>
+    <div style="font-size:11px;color:#9ca3af">Ewes pregnant</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;font-weight:600">Lamb Growth</div>
+    <div style="font-size:28px;font-weight:800;color:#f59e0b;margin:4px 0">+250</div>
+    <div style="font-size:11px;color:#9ca3af">This season</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;font-weight:600">Critical Cases</div>
+    <div style="font-size:28px;font-weight:800;color:#dc2626;margin:4px 0">16</div>
+    <div style="font-size:11px;color:#9ca3af">Need vet now</div>
+  </div>
+  <div style="background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;font-weight:600">Flock Growth</div>
+    <div style="font-size:28px;font-weight:800;color:#2d5a27;margin:4px 0">+42%</div>
+    <div style="font-size:11px;color:#9ca3af">YoY forecast</div>
+  </div>
+</div>
+
+<div class="footer">🐑 Flock Management System &nbsp;·&nbsp; Generated June 2026 &nbsp;·&nbsp; 1,000 sheep total</div>
+
+<script>
+  document.querySelectorAll('.bar-fill').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => { bar.style.width = w; }, 100);
+  });
+</script>
+</body>
+</html>
