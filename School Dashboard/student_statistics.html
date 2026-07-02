@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Student Statistics Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f3; color: #1a1a1a; padding: 2rem; }
+    h1 { font-size: 22px; font-weight: 500; margin-bottom: 0.25rem; }
+    .subtitle { font-size: 14px; color: #666; margin-bottom: 1.5rem; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 1rem 0 1.5rem; }
+    .stat-card { background: #ebebea; border-radius: 8px; padding: 0.9rem 1rem; }
+    .stat-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .stat-val { font-size: 22px; font-weight: 500; }
+    .stat-sub { font-size: 12px; color: #888; margin-top: 4px; }
+    .section-title { font-size: 12px; font-weight: 500; color: #888; margin: 1.5rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; font-size: 12px; color: #666; }
+    .legend span { display: flex; align-items: center; gap: 5px; }
+    .leg-box { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .chart-wrap { position: relative; width: 100%; }
+  </style>
+</head>
+<body>
+
+  <h1>Government School — Student Statistics</h1>
+  <p class="subtitle">Annual analysis: enrollment, admissions, departures, pass &amp; fail rates (2019–2024)</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <p class="stat-label">Total enrolled (2024)</p>
+      <p class="stat-val">1,240</p>
+      <p class="stat-sub">+4.2% vs last year</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">New admissions</p>
+      <p class="stat-val">320</p>
+      <p class="stat-sub">Joined this year</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Left / dropped out</p>
+      <p class="stat-val">98</p>
+      <p class="stat-sub">7.9% dropout rate</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Passed (2024)</p>
+      <p class="stat-val">1,058</p>
+      <p class="stat-sub">85.3% pass rate</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Failed (2024)</p>
+      <p class="stat-val">182</p>
+      <p class="stat-sub">14.7% fail rate</p>
+    </div>
+  </div>
+
+  <p class="section-title">Yearly enrollment — admissions vs departures</p>
+  <div class="legend">
+    <span><span class="leg-box" style="background:#378ADD;"></span>New admissions</span>
+    <span><span class="leg-box" style="background:#D85A30;"></span>Left / dropped out</span>
+  </div>
+  <div class="chart-wrap" style="height: 240px;">
+    <canvas id="enrollChart" role="img" aria-label="Bar chart of yearly new admissions vs departures"></canvas>
+  </div>
+
+  <p class="section-title">Pass vs fail rate (%) — yearly trend</p>
+  <div class="legend">
+    <span><span class="leg-box" style="background:#1D9E75;"></span>Pass %</span>
+    <span><span class="leg-box" style="background:#E24B4A;"></span>Fail %</span>
+  </div>
+  <div class="chart-wrap" style="height: 220px;">
+    <canvas id="passFailChart" role="img" aria-label="Line chart of pass and fail percentages"></canvas>
+  </div>
+
+  <p class="section-title">Cumulative enrollment over 6 years</p>
+  <div class="legend">
+    <span><span class="leg-box" style="background:#7F77DD;"></span>Total students enrolled</span>
+  </div>
+  <div class="chart-wrap" style="height: 200px;">
+    <canvas id="totalChart" role="img" aria-label="Line chart of total enrolled students per year"></canvas>
+  </div>
+
+  <p class="section-title">Grade-wise pass/fail breakdown (2024)</p>
+  <div class="legend">
+    <span><span class="leg-box" style="background:#1D9E75;"></span>Passed</span>
+    <span><span class="leg-box" style="background:#E24B4A;"></span>Failed</span>
+  </div>
+  <div class="chart-wrap" style="height: 320px;">
+    <canvas id="gradeChart" role="img" aria-label="Horizontal bar chart of grade-wise pass and fail counts"></canvas>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    const years = ['2019','2020','2021','2022','2023','2024'];
+
+    new Chart(document.getElementById('enrollChart'), {
+      type: 'bar',
+      data: {
+        labels: years,
+        datasets: [
+          { label: 'New admissions', data: [265,240,280,298,307,320], backgroundColor: '#378ADD', borderRadius: 3, borderSkipped: false },
+          { label: 'Left / dropped out', data: [82,95,88,91,102,98], backgroundColor: '#D85A30', borderRadius: 3, borderSkipped: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { autoSkip: false } },
+          y: { beginAtZero: true, ticks: { callback: v => Math.round(v) } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('passFailChart'), {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [
+          { label: 'Pass %', data: [80,75,82,84,86,85], borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.3, fill: true, pointRadius: 4 },
+          { label: 'Fail %', data: [20,25,18,16,14,15], borderColor: '#E24B4A', backgroundColor: 'rgba(226,75,74,0.08)', tension: 0.3, fill: true, pointRadius: 4, borderDash: [5,4] }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+          x: { ticks: { autoSkip: false } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('totalChart'), {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [
+          { label: 'Total enrolled', data: [980,990,1050,1100,1190,1240], borderColor: '#7F77DD', backgroundColor: 'rgba(127,119,221,0.08)', tension: 0.3, fill: true, pointRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { callback: v => Math.round(v) } },
+          x: { ticks: { autoSkip: false } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('gradeChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10'],
+        datasets: [
+          { label: 'Passed', data: [118,112,109,105,108,101,98,104,103,100], backgroundColor: '#1D9E75', borderRadius: 3, borderSkipped: false },
+          { label: 'Failed', data: [12,18,20,25,16,22,28,15,18,8], backgroundColor: '#E24B4A', borderRadius: 3, borderSkipped: false }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { beginAtZero: true, ticks: { callback: v => Math.round(v) } },
+          y: { ticks: { autoSkip: false } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

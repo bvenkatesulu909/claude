@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>InsightHub – AI‑Powered Analytics Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f9fafb;
+  --fg:#111827;
+  --muted:#6b7280;
+  --primary:#4f46e5;
+  --secondary:#06b6d4;
+  --gradient:linear-gradient(135deg,var(--primary),var(--secondary));
+  --nav-bg:#1f2937;
+  --card-bg:#ffffff;
+  --card-shadow:0 4px 12px rgba(0,0,0,0.05);
+  --radius:12px;
+  --transition:0.2s ease;
+  --font-sans:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg);
+  color:var(--fg);
+  line-height:1.6;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;height:auto}
+button{
+  font-family:inherit;
+  border:none;
+  background:none;
+  cursor:pointer;
+}
+.container{width:90%;max-width:1200px;margin:0 auto;padding:0 1rem}
+
+/* Nav */
+nav{
+  position:sticky;
+  top:0;
+  background:var(--nav-bg);
+  color:#fff;
+  padding:0.75rem 0;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.nav-logo{font-weight:700;font-size:1.25rem}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{color:#e5e7eb;font-weight:500}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--gradient);color:#fff;padding:0.5rem 1rem;border-radius:var(--radius);font-weight:600;transition:var(--transition)}
+.nav-cta:hover{opacity:0.9}
+
+/* Mobile menu */
+.hamburger{display:none;flex-direction:column;gap:4px;width:24px;cursor:pointer}
+.hamburger span{height:2px;background:#fff;border-radius:2px}
+@media(max-width:768px){
+  .nav-links{position:absolute;top:100%;left:0;right:0;background:var(--nav-bg);flex-direction column;align-items:center;padding:1rem 0;display:none;gap:1rem}
+  .nav-links.active{display:flex}
+  .hamburger{display:flex}
+}
+
+/* Hero */
+.hero{
+  background:linear-gradient(120deg,#fff,#f0f9ff);
+  padding:6rem 0 4rem;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--gradient);
+  opacity:0.08;
+  z-index:0;
+}
+.hero-content{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+  max-width:48rem;
+}
+.hero h1{
+  font-size:2.5rem;
+  font-weight:700;
+  line-height:1.2;
+  color:var(--fg);
+}
+.hero p{
+  font-size:1.125rem;
+  color:var(--muted);
+  max-width:38rem;
+}
+.hero-buttons{
+  display:flex;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+.btn-primary{
+  background:var(--gradient);
+  color:#fff;
+  padding:0.75rem 1.5rem;
+  border-radius:var(--radius);
+  font-weight:600;
+  transition:var(--transition);
+  box-shadow:0 2px 6px rgba(79,70,229,0.2);
+}
+.btn-primary:hover{opacity:0.9}
+.btn-secondary{
+  border:2px solid var(--primary);
+  color:var(--primary);
+  padding:0.75rem 1.5rem;
+  border-radius:var(--radius);
+  font-weight:600;
+  transition:var(--transition);
+}
+.btn-secondary:hover{background:var(--primary);color:#fff}
+
+/* Dashboard mock */
+.dashboard-mock{
+  flex:1;
+  min-height:260px;
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--card-shadow);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.dashboard-mock svg{
+  width:80%;
+  height:80%;
+}
+
+/* Trusted strip */
+.trusted{
+  background:#fff;
+  padding:2rem 0;
+  border-top:1px solid #e5e7eb;
+  border-bottom:1px solid #e5e7eb;
+}
+.trusted .logos{
+  display:flex;
+  gap:2rem;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.trusted .logos div{
+  font-weight:600;
+  color:var(--muted);
+  font-size:1.1rem;
+}
+
+/* Features */
+.features{
+  padding:4rem 0;
+  background:#fff;
+}
+.features h2{text-align:center;margin-bottom:2.5rem;font-size:2rem}
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;
+}
+.feature-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:1.5rem;
+  box-shadow:var(--card-shadow);
+  transition:var(--transition);
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+.feature-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#e0e7ff;border-radius:8px}
+.feature-icon svg{width:24px;height:24px;color:var(--primary)}
+.feature-card h3{font-size:1.25rem;font-weight:600}
+.feature-card p{font-size:0.95rem;color:var(--muted)}
+
+/* Stats */
+.stats{
+  background:linear-gradient(120deg,#f0f9ff,#e0f2fe);
+  padding:3rem 0;
+  text-align:center;
+}
+.stats h2{margin-bottom:1.5rem;font-size:2rem}
+.stats-grid{
+  display:flex;
+  gap:2rem;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.stat-item{
+  flex:1;
+  min-width:120px;
+}
+.stat-number{
+  font-size:2.5rem;
+  font-weight:700;
+  color:var(--primary);
+  line-height:1;
+}
+.stat-label{
+  font-size:1rem;
+  color:var(--muted);
+  margin-top:0.25rem;
+}
+
+/* Pricing */
+.pricing{
+  padding:4rem 0;
+  background:#fff;
+}
+.pricing h2{text-align:center;margin-bottom:2.5rem;font-size:2rem}
+.pricing-cards{
+  display:grid;
+  gap:1.5rem;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+}
+.pricing-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:2rem;
+  box-shadow:var(--card-shadow);
+  position:relative;
+  transition:var(--transition);
+}
+.pricing-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+.pricing-card.popular{
+  border:2px solid var(--primary);
+  background:#f0f9ff;
+}
+.popular-badge{
+  position:absolute;
+  top:-0.75rem;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--primary);
+  color:#fff;
+  padding:0.25rem 0.75rem;
+  border-radius:9999px;
+  font-size:0.85rem;
+  font-weight:600;
+}
+.pricing-card h3{font-size:1.5rem;margin-bottom:0.5rem}
+.price{font-size:2rem;font-weight:700;margin:0.5rem 0}
+.price sup{font-size:0.75em;vertical-align:top}
+.pricing-card ul{list-style:none;margin:1.5rem 0;padding:0}
+.pricing-card li{margin:0.5rem 0;display:flex;align-items:center;gap:0.5rem}
+.pricing-card li::before{content:"✓";color:var(--secondary);font-weight:bold}
+.pricing-card .btn-primary{width:100%;text-align:center}
+
+/* Testimonials */
+.testimonials{
+  padding:4rem 0;
+  background:#fff;
+}
+.testimonials h2{text-align:center;margin-bottom:2.5rem;font-size:2rem}
+.testimonial-grid{
+  display:grid;
+  gap:1.5rem;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+}
+.testimonial-card{
+  background:#f9fafb;
+  border-radius:var(--radius);
+  padding:1.5rem;
+  box-shadow:var(--card-shadow);
+  position:relative;
+}
+.testimonial-card::before{
+  content:"“";
+  font-size:4rem;
+  color:#e5e7eb;
+  position:absolute;
+  top:-0.5rem;
+  left:0.5rem;
+  opacity:0.2;
+}
+.testimonial-card p{font-size:1rem;color:var(--fg);margin-bottom:1rem}
+.testimonial-card .author{font-weight:600;color:var(--primary)}
+.testimonial-card .role{font-size:0.9rem;color:var(--muted)}
+
+/* Final CTA */
+.cta-band{
+  background:var(--gradient);
+  color:#fff;
+  text-align:center;
+  padding:3rem 0;
+}
+.cta-band h2{font-size:2rem;margin-bottom:1rem}
+.cta-band p{font-size:1.125rem;margin-bottom:1.5rem;opacity:0.9}
+.cta-band .btn-primary{padding:0.8rem 2rem;font-size:1rem}
+
+/* Footer */
+footer{
+  background:var(--nav-bg);
+  color:#e5e7eb;
+  padding:2.5rem 0 1.5rem;
+}
+.footer-grid{
+  display:grid;
+  gap:2rem;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+}
+.footer-column h3{color:#fff;margin-bottom:1rem;font-size:1.1rem}
+.footer-column a{display:block;margin-bottom:0.5rem;color:#cbd5e1;transition:var(--transition)}
+.footer-column a:hover{color:#fff}
+.footer-bottom{
+  margin-top:2rem;
+  text-align:center;
+  font-size:0.9rem;
+  opacity:0.7;
+}
+
+/* Animations */
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero-content,.feature-card,.pricing-card,.testimonial-card{animation:fadeInUp 0.6s ease-out forwards}
+</style>
+</head>
+<body>
+
+<nav class="container">
+  <div class="nav-logo">InsightHub</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#blog">Blog</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Get Started</a>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<section class="hero container">
+  <div class="hero-content">
+    <h1>Turn Raw Data into Clear, Actionable Insights</h1>
+    <p>InsightHub uses AI‑powered analytics to surface trends, predict outcomes, and empower every team to make smarter decisions—fast.</p>
+    <div class="hero-buttons">
+      <a href="#cta" class="btn-primary">Start free trial</a>
+      <a href="#demo" class="btn-secondary">Watch demo</a>
+    </div>
+  </div>
+  <div class="dashboard-mock">
+    <!-- Abstract dashboard illustration -->
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:0.8" />
+          <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.8" />
+        </linearGradient>
+      </defs>
+      <!-- background grid -->
+      <g stroke="#e5e7eb" stroke-width="1">
+        <line x1="0" y1="40" x2="200" y2="40"/>
+        <line x1="0" y1="80" x2="200" y2="80"/>
+        <line x1="0" y1="120" x2="200" y2="120"/>
+        <line x1="0" y1="160" x2="200" y2="160"/>
+        <line x1="40" y1="0" x2="40" y2="200"/>
+        <line x1="80" y1="0" x2="80" y2="200"/>
+        <line x1="120" y1="0" x2="120" y2="200"/>
+        <line x1="160" y1="0" x2="160" y2="200"/>
+      </g>
+      <!-- cards -->
+      <rect x="20" y="30" width="60" height="40" rx="6" fill="url(#g1)"/>
+      <rect x="120" y="30" width="60" height="40" rx="6" fill="url(#g1)"/>
+      <circle cx="70" cy="110" r="20" fill="url(#g1)"/>
+      <circle cx="130" cy="110" r="20" fill="url(#g1)"/>
+      <path d="M30 150 Q100 80 170 150" stroke="url(#g1)" stroke-width="6" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<section class="trusted container">
+  <div class="logos">
+    <div>Acme Corp</div>
+    <div>Globex</div>
+    <div>Initech</div>
+    <div>Initrode</div>
+    <div>Umbrella</div>
+  </div>
+</section>
+
+<section id="features" class="features container">
+  <h2>Features</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></div>
+      <h3>Real‑time Dashboards</h3>
+      <p>Live updating charts that react instantly to data changes.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a6 6 0 0 0-6 6c0 3.54 2.56 6.5 6 11.54 3.44-5.04 6-8 6-11.54 0-3.54-2.56-6-6-6zm0 10c-2.21 0-4-1.79-4-4h2c0 1.1.9 2 2 2s2-.9 2-2h2c0 2.21-1.79 4-4 4z"/></svg></div>
+      <h3>AI Insights</h3>
+      <p>Automated anomaly detection and predictive forecasts.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg></div>
+      <h3>Integrations</h3>
+      <p>Connect with 100+ data sources via native connectors.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.64 3.36 6 5.92 6 9v5H4v2h14v-2z"/></svg></div>
+      <h3>Smart Alerts</h3>
+      <p>Get notified when thresholds are breached or trends shift.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+      <h3>Collaboration</h3>
+      <p>Share dashboards, comment, and work together in real time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 15c1.66 0 3-1.34 3-3S13.66 9 12 9s-3 1.34-3 3 1.34 3 3 3zm5.3-3h-1.7c-.2-.61-.52-1.1-.94-1.38l-1.42-1.02a4.004 4.004 0 0 0-2.06-1.14H9.8c-.52.18-1 .69-1 1.26v2.4c0 .57.48 1.08 1.08 1.08h.03c.6 0 1.08-.51 1.08-1.08v-1.5c0-.28.22-.5.5-.5h2.5c.28 0 .5.22 .5 .5v1.5c0 .57.48 1.08 1.08 1.08h.03c.6 0 1.08-.51 1.08-1.08v-2.4c0-.57-.48-1.08-1.08-1.08z"/></svg></div>
+      <h3>Security & Compliance</h3>
+      <p>Enterprise‑grade encryption, SOC 2, and GDPR ready.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stats container">
+  <h2>Trusted by Thousands</h2>
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-number">12K+</div>
+      <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">4.8★</div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">99.9%</div>
+      <div class="stat-label">Uptime SLA</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">200+</div>
+      <div class="stat-label">Integrations</div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="pricing container">
+  <h2>Pricing</h2>
+  <div class="pricing-cards">
+    <div class="pricing-card">
+      <h3>Starter</h3>
+      <div class="price">$<span>29</span><sup>/mo</sup></div>
+      <ul>
+        <li>Up to 5 users</li>
+        <li>Basic dashboards</li>
+        <li>Email support</li>
+        <li>Standard integrations</li>
+      </ul>
+      <a href="#cta" class="btn-primary">Get Started</a>
+    </div>
+    <div class="pricing-card popular">
+      <div class="popular-badge">Popular</div>
+      <h3>Pro</h3>
+      <div class="price">$<span>79</span><sup>/mo</sup></div>
+      <ul>
+        <li>Unlimited users</li>
+        <li>Advanced AI insights</li>
+        <li>Priority support</li>
+        <li>All integrations</li>
+        <li>Custom branding</li>
+      </ul>
+      <a href="#cta" class="btn-primary">Get Started</a>
+    </div>
+    <div class="pricing-card">
+      <h3>Enterprise</h3>
+      <div class="price">Custom</div>
+      <ul>
+        <li>Everything in Pro</li>
+        <li>Dedicated account manager</li>
+        <li>On‑premise option</li>
+        <li>Advanced security</li>
+        <li>SLAs & consulting</li>
+      </ul>
+      <a href="#cta" class="btn-primary">Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials" class="testimonials container">
+  <h2>What Our Users Say</h2>
+  <div class="testimonial-grid">
+    <div class="testimonial-card">
+      <p>“InsightHub cut our reporting time by 70%. The AI insights surface opportunities we would have missed.”</p>
+      <div class="author">Jordan Lee</div>
+      <div class="role">Director of Analytics, Acme Corp</div>
+    </div>
+    <div class="testimonial-card">
+      <p>“The real‑time dashboards keep our sales team aligned. Setup was painless and the support team is fantastic.”</p>
+      <div class="author">Priya Mehta</div>
+      <div class="role">VP of Sales, Globex</div>
+    </div>
+    <div class="testimonial-card">
+      <p>“We moved from a patchwork of tools to a single platform. Security and compliance are top‑notch.”</p>
+      <div class="author">Alex Ruiz</div>
+      <div class="role">CTO, Initech</div>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta-band container">
+  <h2>Ready to Transform Your Data?</h2>
+  <p>Start a free trial today—no credit card required.</p>
+  <a href="#signup" class="btn-primary">Start free trial</a>
+</section>
+
+<footer class="container">
+  <div class="footer-grid">
+    <div class="footer-column">
+      <h3>Product</h3>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#docs">Docs</a>
+      <a href="#blog">Blog</a>
+    </div>
+    <div class="footer-column">
+      <h3>Company</h3>
+      <a href="#about">About Us</a>
+      <a href="#careers">Careers</a>
+      <a href="#press">Press</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="footer-column">
+      <h3>Resources</h3>
+      <a href="#guides">Guides</a>
+      <a href="#webinars">Webinars</a>
+      <a href="#templates">Templates</a>
+      <a href="#security">Security</a>
+    </div>
+    <div class="footer-column">
+      <h3>Legal</h3>
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#terms">Terms of Service</a>
+      <a href="#cookies">Cookie Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2025 InsightHub. All rights reserved.
+  </div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    hamburger.classList.toggle('open');
+  });
+</script>
+</body>
+</html>

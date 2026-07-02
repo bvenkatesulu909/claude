@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>India Distribution &amp; Bundle Pricing – Timberleaf Press</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Pan-India book distribution from Timberleaf Press — regional dispatch hubs, delivery timelines, and bundle pricing for schools, book clubs, and retailers.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf7f1;--fg:#241f1a;--muted:#6f665b;
+  --primary:#8a5a2b;--secondary:#2f6b4f;--accent:#c8862b;--ink:#2b2620;
+  --gradient:linear-gradient(135deg,var(--primary),var(--secondary));
+  --nav-bg:#2b2620;--card-bg:#ffffff;--paper:#fffdf8;
+  --card-shadow:0 4px 14px rgba(43,38,32,0.07);--radius:12px;--transition:0.2s ease;
+  --font-sans:'Inter',sans-serif;--font-display:'Fraunces',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--fg);line-height:1.6}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;height:auto}
+button{font-family:inherit;border:none;background:none;cursor:pointer}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;letter-spacing:-0.01em}
+.container{width:90%;max-width:1200px;margin:0 auto;padding:0 1rem}
+.section{padding:4.5rem 0}
+
+/* Nav */
+nav{position:sticky;top:0;background:var(--nav-bg);color:#fff;padding:0.75rem 0;z-index:1000;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--font-display);font-weight:700;font-size:1.3rem;display:flex;align-items:center;gap:0.5rem}
+.nav-logo svg{width:22px;height:22px}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center}
+.nav-links a{color:#e9e2d6;font-weight:500}
+.nav-links a:hover,.nav-links a.active{color:#fff}
+.nav-cta{background:var(--gradient);color:#fff;padding:0.5rem 1rem;border-radius:var(--radius);font-weight:600;transition:var(--transition)}
+.nav-cta:hover{opacity:0.9}
+.hamburger{display:none;flex-direction:column;gap:4px;width:24px;cursor:pointer}
+.hamburger span{height:2px;background:#fff;border-radius:2px}
+@media(max-width:820px){
+  .nav-links{position:absolute;top:100%;left:0;right:0;background:var(--nav-bg);flex-direction:column;align-items:center;padding:1rem 0;display:none;gap:1rem}
+  .nav-links.active{display:flex}
+  .hamburger{display:flex}
+}
+
+/* Hero */
+.hero{background:linear-gradient(120deg,#fffdf8,#f2ece0);padding:4.5rem 0 3.5rem;position:relative;overflow:hidden}
+.hero-inner{display:grid;grid-template-columns:1.1fr 0.9fr;gap:2.5rem;align-items:center}
+@media(max-width:860px){.hero-inner{grid-template-columns:1fr}}
+.eyebrow{display:inline-block;background:#efe6d6;color:var(--primary);font-weight:600;font-size:0.8rem;letter-spacing:0.04em;text-transform:uppercase;padding:0.35rem 0.75rem;border-radius:9999px;margin-bottom:1rem}
+.hero h1{font-size:2.7rem;line-height:1.1;color:var(--ink)}
+@media(max-width:860px){.hero h1{font-size:2.1rem}}
+.hero p{font-size:1.1rem;color:var(--muted);max-width:34rem;margin-top:1rem}
+.hero-buttons{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.75rem}
+.btn-primary{background:var(--gradient);color:#fff;padding:0.8rem 1.6rem;border-radius:var(--radius);font-weight:600;transition:var(--transition);box-shadow:0 3px 8px rgba(138,90,43,0.25);display:inline-block}
+.btn-primary:hover{opacity:0.92;transform:translateY(-1px)}
+.btn-secondary{border:2px solid var(--primary);color:var(--primary);padding:0.75rem 1.5rem;border-radius:var(--radius);font-weight:600;transition:var(--transition);display:inline-block}
+.btn-secondary:hover{background:var(--primary);color:#fff}
+
+.hero-art{display:flex;align-items:center;justify-content:center}
+.hero-art svg{width:100%;max-width:340px;filter:drop-shadow(0 12px 24px rgba(43,38,32,0.15))}
+
+/* Section headings */
+.section-head{text-align:center;max-width:640px;margin:0 auto 2.75rem}
+.section-head h2{font-size:2.1rem;color:var(--ink)}
+.section-head p{color:var(--muted);margin-top:0.6rem}
+
+/* Stats strip */
+.stats-strip{background:var(--nav-bg);color:#f5efe4;text-align:center;padding:2.25rem 0}
+.stats-grid{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
+.stat-item{flex:1;min-width:150px}
+.stat-number{font-family:var(--font-display);font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1}
+.stat-label{font-size:0.95rem;color:#cbc1ad;margin-top:0.35rem}
+
+/* Zones */
+.zones{background:var(--paper)}
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem}
+.zone-card{background:var(--card-bg);border:1px solid #efe6d6;border-radius:var(--radius);padding:1.6rem;box-shadow:var(--card-shadow);transition:var(--transition)}
+.zone-card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(43,38,32,0.1)}
+.zone-card h3{font-size:1.2rem;display:flex;align-items:center;gap:0.5rem}
+.zone-card .eta{display:inline-block;font-size:0.72rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--secondary);background:#e5efe8;padding:0.2rem 0.55rem;border-radius:9999px;margin:0.7rem 0 0.85rem}
+.zone-card ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:0.35rem}
+.zone-card li{font-size:0.92rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem}
+.zone-card li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* Timeline */
+.timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1.25rem;counter-reset:step}
+.tl-step{background:var(--paper);border:1px solid #efe6d6;border-radius:var(--radius);padding:1.5rem;position:relative}
+.tl-step::before{counter-increment:step;content:counter(step);display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--gradient);color:#fff;font-weight:700;font-family:var(--font-display);margin-bottom:0.75rem}
+.tl-step h3{font-size:1.05rem;margin-bottom:0.35rem}
+.tl-step p{font-size:0.9rem;color:var(--muted)}
+
+/* Bundle pricing */
+.bundles{background:linear-gradient(120deg,#f2ece0,#eef3ee)}
+.bundle-cards{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.bundle-card{background:var(--card-bg);border:1px solid #efe6d6;border-radius:var(--radius);padding:2rem;box-shadow:var(--card-shadow);position:relative;transition:var(--transition)}
+.bundle-card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(43,38,32,0.1)}
+.bundle-card.popular{border:2px solid var(--primary);background:#fffaf0}
+.popular-badge{position:absolute;top:-0.75rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.25rem 0.85rem;border-radius:9999px;font-size:0.8rem;font-weight:600;white-space:nowrap}
+.bundle-card h3{font-size:1.35rem;margin-bottom:0.25rem}
+.bundle-card .sub{font-size:0.88rem;color:var(--muted);margin-bottom:0.5rem}
+.price{font-family:var(--font-display);font-size:2rem;font-weight:700;margin:0.4rem 0;color:var(--ink)}
+.price sup{font-size:0.6em;vertical-align:top}
+.per-copy{font-size:0.85rem;color:var(--accent);font-weight:600}
+.bundle-card ul{list-style:none;margin:1.25rem 0;padding:0}
+.bundle-card li{margin:0.5rem 0;display:flex;align-items:flex-start;gap:0.5rem;font-size:0.93rem}
+.bundle-card li::before{content:"✓";color:var(--secondary);font-weight:bold}
+.bundle-card .btn-primary{width:100%;text-align:center}
+
+/* Pincode checker */
+.check-card{background:var(--card-bg);border:1px solid #efe6d6;border-radius:var(--radius);padding:1.75rem;box-shadow:var(--card-shadow);max-width:560px;margin:2rem auto 0;text-align:center}
+.check-card h3{font-size:1.15rem;margin-bottom:0.5rem}
+.check-card p{color:var(--muted);font-size:0.92rem;margin-bottom:1.1rem}
+.check-form{display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center}
+.check-form input{flex:1;min-width:180px;padding:0.7rem 1rem;border:1px solid #e0d5c1;border-radius:var(--radius);font-family:inherit;font-size:0.95rem;background:var(--paper)}
+.check-form input:focus{outline:2px solid var(--primary);outline-offset:1px}
+.check-result{margin-top:1rem;font-size:0.92rem;font-weight:600;min-height:1.3em}
+.check-result.ok{color:var(--secondary)}
+.check-result.warn{color:var(--accent)}
+
+/* CTA */
+.cta-band{background:var(--gradient);color:#fff;text-align:center;padding:3.5rem 0}
+.cta-band h2{font-size:2.1rem;margin-bottom:0.75rem;color:#fff}
+.cta-band p{font-size:1.125rem;margin-bottom:1.5rem;opacity:0.92}
+.cta-band .btn-white{background:#fff;color:var(--primary);padding:0.85rem 2rem;border-radius:var(--radius);font-weight:700;display:inline-block;transition:var(--transition)}
+.cta-band .btn-white:hover{transform:translateY(-1px)}
+
+/* Footer */
+footer{background:var(--nav-bg);color:#cbc1ad;padding:2.75rem 0 1.5rem}
+.footer-grid{display:grid;gap:2rem;grid-template-columns:1.4fr repeat(3,1fr)}
+@media(max-width:760px){.footer-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+.footer-column h3{color:#fff;margin-bottom:1rem;font-size:1.05rem}
+.footer-column p{font-size:0.9rem;max-width:22rem}
+.footer-column a{display:block;margin-bottom:0.5rem;color:#cbc1ad;transition:var(--transition);font-size:0.95rem}
+.footer-column a:hover{color:#fff}
+.footer-bottom{margin-top:2rem;text-align:center;font-size:0.9rem;opacity:0.7;border-top:1px solid #40392f;padding-top:1.25rem}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero-inner,.zone-card,.tl-step,.bundle-card{animation:fadeInUp 0.6s ease-out both}
+</style>
+</head>
+<body>
+
+<nav class="container">
+  <a href="index.html" class="nav-logo">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4V4z" fill="#c8862b"/><path d="M20 4h-7a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h7V4z" fill="#e9e2d6"/></svg>
+    Timberleaf Press
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#process">Process</a></li>
+    <li><a href="index.html#paper">Paper &amp; Timber</a></li>
+    <li><a href="distribution.html" class="active">India Distribution</a></li>
+    <li><a href="catalog.html">Catalog</a></li>
+    <li><a href="dashboard.html">Analytics</a></li>
+  </ul>
+  <a href="#bundles" class="nav-cta">Order a Bundle</a>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <span class="eyebrow">Pan-India distribution</span>
+      <h1>Printed in-house. Delivered to every state in India.</h1>
+      <p>Four regional dispatch hubs put your books within a 2–5 day reach of any pincode — from metro bookstores to campuses, libraries, and D2C doorsteps. Order in bulk or as ready-made bundles.</p>
+      <div class="hero-buttons">
+        <a href="#bundles" class="btn-primary">See bundle pricing</a>
+        <a href="#zones" class="btn-secondary">View delivery zones</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="150" cy="150" r="110" fill="#f2ece0"/>
+        <path d="M150 60 C110 90 90 130 90 170 C90 220 150 250 150 250 C150 250 210 220 210 170 C210 130 190 90 150 60Z" fill="#2f6b4f" opacity="0.9"/>
+        <circle cx="120" cy="150" r="7" fill="#c8862b"/>
+        <circle cx="165" cy="120" r="7" fill="#fff"/>
+        <circle cx="175" cy="190" r="7" fill="#fff"/>
+        <circle cx="140" cy="200" r="7" fill="#c8862b"/>
+        <rect x="128" y="255" width="44" height="14" rx="4" fill="#8a5a2b"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="stats-strip">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item"><div class="stat-number">4</div><div class="stat-label">Regional dispatch hubs</div></div>
+      <div class="stat-item"><div class="stat-number">28</div><div class="stat-label">States &amp; UTs covered</div></div>
+      <div class="stat-item"><div class="stat-number">2–5 days</div><div class="stat-label">Avg. delivery window</div></div>
+      <div class="stat-item"><div class="stat-number">₹2,499</div><div class="stat-label">Starting bundle price</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Zones -->
+<section id="zones" class="section zones">
+  <div class="container">
+    <div class="section-head">
+      <h2>Regional dispatch hubs</h2>
+      <p>Stock is pre-positioned at four hubs so orders ship from the closest warehouse to your delivery address.</p>
+    </div>
+    <div class="zone-grid">
+      <div class="zone-card">
+        <h3>North Hub — Delhi NCR</h3>
+        <div class="eta">2–3 day delivery</div>
+        <ul>
+          <li>Delhi &amp; NCR</li>
+          <li>Chandigarh &amp; Punjab</li>
+          <li>Jaipur &amp; Rajasthan</li>
+          <li>Lucknow &amp; Uttar Pradesh</li>
+        </ul>
+      </div>
+      <div class="zone-card">
+        <h3>West Hub — Mumbai</h3>
+        <div class="eta">2–3 day delivery</div>
+        <ul>
+          <li>Mumbai &amp; Pune</li>
+          <li>Ahmedabad &amp; Gujarat</li>
+          <li>Surat &amp; Vadodara</li>
+          <li>Nagpur &amp; Maharashtra</li>
+        </ul>
+      </div>
+      <div class="zone-card">
+        <h3>South Hub — Bengaluru</h3>
+        <div class="eta">2–4 day delivery</div>
+        <ul>
+          <li>Bengaluru &amp; Karnataka</li>
+          <li>Chennai &amp; Tamil Nadu</li>
+          <li>Hyderabad &amp; Telangana</li>
+          <li>Kochi &amp; Kerala</li>
+        </ul>
+      </div>
+      <div class="zone-card">
+        <h3>East Hub — Kolkata</h3>
+        <div class="eta">3–5 day delivery</div>
+        <ul>
+          <li>Kolkata &amp; West Bengal</li>
+          <li>Bhubaneswar &amp; Odisha</li>
+          <li>Patna &amp; Bihar</li>
+          <li>Guwahati &amp; the Northeast</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="check-card">
+      <h3>Check delivery to your pincode</h3>
+      <p>Enter a 6-digit pincode to see your estimated hub and delivery window.</p>
+      <form class="check-form" id="pincodeForm">
+        <input type="text" id="pincodeInput" maxlength="6" placeholder="e.g. 560001" inputmode="numeric">
+        <button type="submit" class="btn-primary">Check</button>
+      </form>
+      <div class="check-result" id="pincodeResult"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>From warehouse to your doorstep</h2>
+      <p>Every order moves through the same four checkpoints, tracked end to end.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-step"><h3>Order placed</h3><p>Bundle or bulk order confirmed and allocated to the nearest hub with stock.</p></div>
+      <div class="tl-step"><h3>Pack &amp; dispatch</h3><p>Books are quality-checked, boxed, and handed to our logistics partner within 24 hours.</p></div>
+      <div class="tl-step"><h3>In transit</h3><p>Track your shipment by AWB number as it moves through regional sort hubs.</p></div>
+      <div class="tl-step"><h3>Delivered</h3><p>Doorstep delivery with proof of delivery, anywhere from a metro flat to a rural pincode.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Bundle pricing -->
+<section id="bundles" class="section bundles">
+  <div class="container">
+    <div class="section-head">
+      <h2>Bundle pricing for India delivery</h2>
+      <p>Fixed-price bundles for schools, book clubs, retailers, and gifting — GST and pan-India delivery included.</p>
+    </div>
+    <div class="bundle-cards">
+      <div class="bundle-card">
+        <h3>Starter Bundle</h3>
+        <div class="sub">Pack of 5 copies</div>
+        <div class="price">₹<span>1,299</span><sup>/bundle</sup></div>
+        <div class="per-copy">≈ ₹260 per copy</div>
+        <ul>
+          <li>5 paperback copies, single or mixed title</li>
+          <li>Doorstep delivery to any Indian pincode</li>
+          <li>GST &amp; packaging included</li>
+          <li>3–5 day dispatch from nearest hub</li>
+        </ul>
+        <a href="#quote" class="btn-primary">Order this bundle</a>
+      </div>
+      <div class="bundle-card popular">
+        <div class="popular-badge">Most popular</div>
+        <h3>India Bundle</h3>
+        <div class="sub">Pack of 10 copies</div>
+        <div class="price">₹<span>2,499</span><sup>/bundle</sup></div>
+        <div class="per-copy">≈ ₹250 per copy</div>
+        <ul>
+          <li>10 paperback copies, mixed or single title</li>
+          <li>Doorstep delivery to any Indian pincode</li>
+          <li>GST &amp; packaging included</li>
+          <li>3–5 day dispatch from nearest hub</li>
+          <li>Ideal for schools, book clubs &amp; gifting</li>
+        </ul>
+        <a href="#quote" class="btn-primary">Order this bundle</a>
+      </div>
+      <div class="bundle-card">
+        <h3>Retailer Bundle</h3>
+        <div class="sub">Pack of 25 copies</div>
+        <div class="price">₹<span>5,750</span><sup>/bundle</sup></div>
+        <div class="per-copy">≈ ₹230 per copy</div>
+        <ul>
+          <li>25 paperback copies, assorted titles available</li>
+          <li>Priority dispatch, 2–4 day delivery</li>
+          <li>GST invoice for resale</li>
+          <li>Dedicated print advisor for reorders</li>
+        </ul>
+        <a href="#quote" class="btn-primary">Order this bundle</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="quote" class="cta-band">
+  <div class="container">
+    <h2>Ready to ship books across India?</h2>
+    <p>Tell us the bundle size and delivery pincodes — we'll confirm dispatch hub and timeline within one business day.</p>
+    <a href="mailto:distribution@timberleafpress.com" class="btn-white">Request distribution quote</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-column">
+        <h3>Timberleaf Press</h3>
+        <p>Sustainable book manufacturing — printing, binding, and pan-India distribution for publishers and authors since 2009.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Distribution</h3>
+        <a href="#zones">Delivery zones</a>
+        <a href="#bundles">Bundle pricing</a>
+        <a href="index.html#pricing">Print pricing</a>
+      </div>
+      <div class="footer-column">
+        <h3>Company</h3>
+        <a href="index.html#process">Our process</a>
+        <a href="index.html#paper">Sustainability</a>
+        <a href="#quote">Contact</a>
+      </div>
+      <div class="footer-column">
+        <h3>Legal</h3>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">FSC Licence</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 Timberleaf Press. All rights reserved. · FSC® C000000</div>
+  </div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    hamburger.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => navLinks.classList.remove('active'))
+  );
+
+  const hubs = [
+    {prefix:['11','12','13','14','15','16','17','30','31','32'], name:'North Hub (Delhi NCR)', eta:'2–3 days'},
+    {prefix:['40','41','42','38','39'], name:'West Hub (Mumbai)', eta:'2–3 days'},
+    {prefix:['56','60','61','62','68','69'], name:'South Hub (Bengaluru)', eta:'2–4 days'},
+    {prefix:['70','71','75','80','78'], name:'East Hub (Kolkata)', eta:'3–5 days'}
+  ];
+
+  document.getElementById('pincodeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('pincodeInput');
+    const result = document.getElementById('pincodeResult');
+    const val = input.value.trim();
+    if(!/^\d{6}$/.test(val)){
+      result.textContent = 'Enter a valid 6-digit pincode.';
+      result.className = 'check-result warn';
+      return;
+    }
+    const prefix2 = val.slice(0,2);
+    const hub = hubs.find(h => h.prefix.includes(prefix2));
+    if(hub){
+      result.textContent = `Ships from ${hub.name} · estimated delivery in ${hub.eta}.`;
+      result.className = 'check-result ok';
+    } else {
+      result.textContent = 'Deliverable pan-India · estimated delivery in 3–6 days from nearest hub.';
+      result.className = 'check-result ok';
+    }
+  });
+</script>
+</body>
+</html>
