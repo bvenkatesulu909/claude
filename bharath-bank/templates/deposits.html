@@ -48,11 +48,13 @@
     <div class="deposit-actions">
       {% if d.deposit_type == 'RD' and d.installments_paid < d.tenure_months %}
       <form method="post" action="{{ url_for('pay_rd', dep_id=d.id) }}">
+        {{ csrf_field() }}
         <button class="btn btn-primary" type="submit">Pay installment ({{ d.principal_paise | inr }})</button>
       </form>
       {% endif %}
       <form method="post" action="{{ url_for('close_deposit', dep_id=d.id) }}"
             onsubmit="return confirm('Close this deposit and credit the proceeds to your savings account?')">
+        {{ csrf_field() }}
         <button class="btn btn-light" type="submit">Close / withdraw</button>
       </form>
     </div>

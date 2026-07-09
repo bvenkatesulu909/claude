@@ -6,6 +6,7 @@
     <h2>Open your account</h2>
     <div class="sub">It only takes a minute. Your account number is generated instantly.</div>
     <form method="post">
+      {{ csrf_field() }}
       <div class="form-row">
         <label for="full_name">Full name</label>
         <input id="full_name" name="full_name" required autofocus>

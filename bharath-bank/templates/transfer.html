@@ -6,6 +6,7 @@
     <h2>Transfer money</h2>
     <div class="sub">From {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
     <form method="post">
+      {{ csrf_field() }}
       <div class="form-row">
         <label for="to_account">Payee account number ({{ BANK_SHORT }})</label>
         <input id="to_account" name="to_account" required autofocus placeholder="e.g. 172912345678">

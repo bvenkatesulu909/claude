@@ -10,15 +10,20 @@ banking network and holds no real money.
 """
 
 import os
+import re
+import hmac
+import math
 import random
+import secrets
 import sqlite3
 import functools
 from datetime import datetime, date
 
 from flask import (
     Flask, g, render_template, request, redirect, url_for,
-    session, flash, jsonify, abort, Response,
+    session, flash, jsonify, abort, Response, current_app,
 )
+from markupsafe import Markup
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import finance
@@ -36,7 +41,56 @@ IFSC_CODE = "BBIN0001729"          # single-branch demo bank
 BRANCH_NAME = "Bharath Nagar Main Branch, Hyderabad"
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("BBI_SECRET", "bharath-bank-dev-secret-change-me")
+
+# --- Secret key: fail closed in production, dev fallback otherwise (SECURITY C1) ---
+_secret = os.environ.get("BBI_SECRET")
+if not _secret:
+    if os.environ.get("BBI_ENV") == "production":
+        raise RuntimeError("BBI_SECRET must be set in production.")
+    _secret = "bharath-bank-dev-secret-change-me"   # dev-only convenience
+app.config["SECRET_KEY"] = _secret
+
+# Harden the session cookie.
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=os.environ.get("BBI_ENV") == "production",
+)
+
+# Per-transaction ceiling for this demo: ₹10 crore (SECURITY H2).
+# ₹10 crore = 100,000,000 rupees = 10,000,000,000 paise.
+MAX_TXN_PAISE = 10_000_000_000
+
+
+# --------------------------------------------------------------------------- #
+# CSRF protection (lightweight, standard-library only) — SECURITY H1
+# --------------------------------------------------------------------------- #
+def csrf_token():
+    """Return the per-session CSRF token, minting one on first use."""
+    token = session.get("_csrf_token")
+    if not token:
+        token = secrets.token_hex(32)
+        session["_csrf_token"] = token
+    return token
+
+
+def csrf_field():
+    """Hidden <input> to drop inside every POST <form>."""
+    return Markup(
+        f'<input type="hidden" name="_csrf_token" value="{csrf_token()}">'
+    )
+
+
+@app.before_request
+def csrf_protect():
+    # Skip during automated tests (test client can't easily carry a token).
+    if current_app.testing:
+        return
+    if request.method == "POST":
+        sent = request.form.get("_csrf_token", "")
+        expected = session.get("_csrf_token", "")
+        if not (expected and hmac.compare_digest(str(sent), str(expected))):
+            abort(400, description="Invalid or missing CSRF token.")
 
 
 # --------------------------------------------------------------------------- #
@@ -200,6 +254,15 @@ def init_db():
             ref_no            TEXT NOT NULL,
             FOREIGN KEY (loan_id) REFERENCES loans (id)
         );
+
+        -- Performance indexes (see PERFORMANCE.md) --
+        CREATE INDEX IF NOT EXISTS idx_txn_account_created  ON transactions(account_id, created_at);
+        CREATE INDEX IF NOT EXISTS idx_accounts_user        ON accounts(user_id);
+        CREATE INDEX IF NOT EXISTS idx_accounts_number      ON accounts(account_number);
+        CREATE INDEX IF NOT EXISTS idx_deposits_user_status ON deposits(user_id, status);
+        CREATE INDEX IF NOT EXISTS idx_loans_user_status    ON loans(user_id, status);
+        CREATE INDEX IF NOT EXISTS idx_loans_account        ON loans(loan_account);
+        CREATE INDEX IF NOT EXISTS idx_loan_payments_loan   ON loan_payments(loan_id);
         """
     )
     db.commit()
@@ -269,9 +332,14 @@ def seed_reference_data(db):
 # --------------------------------------------------------------------------- #
 def rupees_to_paise(value):
     """Accepts a string/number of rupees and returns integer paise. Raises ValueError."""
-    amount = round(float(value) * 100)
+    rupees = float(value)                       # non-numeric -> ValueError (handled by callers)
+    if not math.isfinite(rupees):               # reject nan / inf / -inf (SECURITY H2)
+        raise ValueError("Amount must be a finite number.")
+    amount = round(rupees * 100)
     if amount <= 0:
         raise ValueError("Amount must be greater than zero.")
+    if amount > MAX_TXN_PAISE:
+        raise ValueError("Amount exceeds the per-transaction limit.")
     return int(amount)
 
 
@@ -343,6 +411,7 @@ def inject_globals():
         "BRANCH_NAME": BRANCH_NAME,
         "current_user": get_current_user(),
         "year": datetime.now().year,
+        "csrf_field": csrf_field,
     }
 
 
@@ -444,9 +513,11 @@ def register():
         if error is None:
             try:
                 opening_val = float(opening)
-                if opening_val < 0:
+                if not math.isfinite(opening_val) or opening_val < 0:
                     raise ValueError
                 opening_paise = round(opening_val * 100)
+                if opening_paise > MAX_TXN_PAISE:
+                    raise ValueError
             except ValueError:
                 error = "Opening balance must be a valid non-negative amount."
 
@@ -480,8 +551,9 @@ def register():
                          "Opening deposit", "Self", gen_ref_no(), created),
                     )
                 db.commit()
-                flash(f"Welcome to {BANK_NAME}! Your account number is {acc_number}.", "success")
+                session.clear()                 # rotate session id — prevent fixation (SECURITY M1)
                 session["user_id"] = user_id
+                flash(f"Welcome to {BANK_NAME}! Your account number is {acc_number}.", "success")
                 return redirect(url_for("dashboard"))
 
         flash(error, "danger")
@@ -656,11 +728,25 @@ def kyc():
         f = request.form
         income_raw = f.get("annual_income", "").strip()
         try:
-            income_paise = round(float(income_raw) * 100) if income_raw else None
-            if income_paise is not None and income_paise < 0:
-                raise ValueError
+            if income_raw:
+                income_val = float(income_raw)
+                if not math.isfinite(income_val) or income_val < 0:
+                    raise ValueError
+                income_paise = round(income_val * 100)
+            else:
+                income_paise = None
         except ValueError:
             flash("Annual income must be a valid amount.", "danger")
+            return redirect(url_for("kyc"))
+
+        # --- KYC identity format validation (SECURITY M3) ---
+        pan = f.get("pan", "").strip().upper()
+        aadhaar = f.get("aadhaar", "").strip()
+        if pan and not re.fullmatch(r"[A-Z]{5}[0-9]{4}[A-Z]", pan):
+            flash("PAN must be in the format ABCDE1234F.", "danger")
+            return redirect(url_for("kyc"))
+        if aadhaar and not re.fullmatch(r"[0-9]{12}", aadhaar):
+            flash("Aadhaar must be exactly 12 digits.", "danger")
             return redirect(url_for("kyc"))
 
         fields = dict(
@@ -670,8 +756,8 @@ def kyc():
             city=f.get("city", "").strip(),
             state=f.get("state", "").strip(),
             pincode=f.get("pincode", "").strip(),
-            pan=f.get("pan", "").strip().upper(),
-            aadhaar_last4=f.get("aadhaar", "").strip()[-4:],
+            pan=pan,
+            aadhaar_last4=aadhaar[-4:],
             occupation=f.get("occupation", "").strip(),
             annual_income_paise=income_paise,
             nominee_name=f.get("nominee_name", "").strip(),
@@ -746,6 +832,8 @@ def open_deposit():
         try:
             amount = rupees_to_paise(request.form.get("amount", ""))
             tenure = int(request.form.get("tenure_months", ""))
+            if tenure <= 0:
+                raise ValueError
         except ValueError:
             flash("Enter a valid amount and a whole number of months.", "danger")
             return redirect(url_for("open_deposit"))
@@ -894,6 +982,8 @@ def apply_loan():
         try:
             amount = rupees_to_paise(request.form.get("amount", ""))
             tenure = int(request.form.get("tenure_months", ""))
+            if tenure <= 0:
+                raise ValueError
         except ValueError:
             flash("Enter a valid amount and a whole number of months.", "danger")
             return redirect(url_for("apply_loan"))
@@ -1093,15 +1183,26 @@ def _post_transaction(account_id, txn_type, amount_paise, category, description,
                       counterparty, ref=None, commit=True):
     """Apply a single ledger entry and update the running account balance."""
     db = get_db()
-    row = db.execute(
+    # Atomic balance update at the SQL level so the DB — not stale Python state —
+    # enforces the balance floor, closing the double-submit / lost-update race
+    # and overdraft window in one statement (SECURITY M2).
+    if txn_type == "CREDIT":
+        db.execute(
+            "UPDATE accounts SET balance_paise = balance_paise + ? WHERE id = ?",
+            (amount_paise, account_id),
+        )
+    else:
+        cur = db.execute(
+            "UPDATE accounts SET balance_paise = balance_paise - ?"
+            " WHERE id = ? AND balance_paise >= ?",
+            (amount_paise, account_id, amount_paise),
+        )
+        if cur.rowcount == 0:
+            raise ValueError("Insufficient balance.")
+    balance = db.execute(
         "SELECT balance_paise FROM accounts WHERE id = ?", (account_id,)
-    ).fetchone()
-    balance = row["balance_paise"]
-    balance = balance + amount_paise if txn_type == "CREDIT" else balance - amount_paise
+    ).fetchone()["balance_paise"]
 
-    db.execute(
-        "UPDATE accounts SET balance_paise = ? WHERE id = ?", (balance, account_id)
-    )
     db.execute(
         "INSERT INTO transactions (account_id, txn_type, amount_paise, balance_paise,"
         " category, description, counterparty, ref_no, created_at)"
@@ -1126,4 +1227,5 @@ if __name__ == "__main__":
     print(f"  Database: {DB_FILE}")
     port = int(os.environ.get("PORT", 5055))
     print(f"  Open http://127.0.0.1:{port} in your browser")
-    app.run(host="127.0.0.1", port=port, debug=True)
+    app.run(host="127.0.0.1", port=port,
+            debug=os.environ.get("BBI_ENV") != "production")

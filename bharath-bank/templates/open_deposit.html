@@ -6,6 +6,7 @@
     <h2>Open a Fixed / Recurring Deposit</h2>
     <div class="sub">From savings a/c {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
     <form method="post">
+      {{ csrf_field() }}
       <div class="form-row">
         <label>Scheme</label>
         <select name="scheme_code" id="scheme" required>

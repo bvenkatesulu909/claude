@@ -40,6 +40,7 @@
       <a class="btn btn-light" href="{{ url_for('loan_detail', loan_id=l.id) }}">View schedule</a>
       {% if l.status == 'ACTIVE' %}
       <form method="post" action="{{ url_for('pay_emi', loan_id=l.id) }}">
+        {{ csrf_field() }}
         <button class="btn btn-primary" type="submit">Pay EMI ({{ l.emi_paise | inr }})</button>
       </form>
       {% endif %}

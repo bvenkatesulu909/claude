@@ -46,10 +46,12 @@
           {% if l.status == 'PENDING' %}
           <div class="deposit-actions" style="margin-top:0">
             <form method="post" action="{{ url_for('admin.loan_decision', loan_id=l.id) }}">
+              {{ csrf_field() }}
               <input type="hidden" name="action" value="approve">
               <button class="btn btn-primary" type="submit">Approve</button>
             </form>
             <form method="post" action="{{ url_for('admin.loan_decision', loan_id=l.id) }}">
+              {{ csrf_field() }}
               <input type="hidden" name="action" value="reject">
               <button class="btn btn-light" type="submit">Reject</button>
             </form>

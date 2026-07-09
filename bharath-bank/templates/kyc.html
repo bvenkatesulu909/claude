@@ -7,6 +7,7 @@
     <div class="sub">Complete your Know-Your-Customer details. Fields marked * are
       required to verify KYC and to apply for loans.</div>
     <form method="post">
+      {{ csrf_field() }}
       <div class="two-col">
         <div class="form-row">
           <label>Date of birth *</label>

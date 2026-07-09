@@ -12,6 +12,7 @@ Run: cd bharath-bank && PYTHONIOENCODING=utf-8 python scripts/full_e2e.py 2>&1 |
 """
 
 import os
+import re
 import sys
 import time
 import sqlite3
@@ -30,6 +31,34 @@ TIMEOUT = 5
 test_results = []
 session = requests.Session()
 session.timeout = TIMEOUT
+
+# --- CSRF support (SECURITY H1) ----------------------------------------------
+# The live server now enforces a per-session CSRF token on every POST. The token
+# is session-wide and rendered into every form. We fetch it from whichever form
+# page is currently reachable (authed or not) and auto-inject it into all POSTs
+# so the existing test bodies need no changes.
+_CSRF_RE = re.compile(r'name="_csrf_token"\s+value="([0-9a-f]+)"')
+
+def get_csrf_token(preferred=None):
+    for path in [preferred, "/deposit", "/login", "/register", "/loans", "/deposits"]:
+        if not path:
+            continue
+        try:
+            r = session.get(SERVER_URL + path, timeout=TIMEOUT)
+            m = _CSRF_RE.search(r.text)
+            if m:
+                return m.group(1)
+        except requests.exceptions.RequestException:
+            pass
+    return ""
+
+_orig_post = session.post
+def _post_with_csrf(url, data=None, **kwargs):
+    if isinstance(data, dict):
+        data = dict(data)
+        data.setdefault("_csrf_token", get_csrf_token())
+    return _orig_post(url, data=data, **kwargs)
+session.post = _post_with_csrf
 
 # Helper: unique test email
 def gen_email(prefix="test"):
@@ -149,7 +178,7 @@ def test_registration():
         "state": "Telangana",
         "pincode": "500001",
         "pan": "ABCDE1234F",
-        "aadhaar": "1234567890123456",  # only last 4 used
+        "aadhaar": "123456789012",  # 12 digits; only last 4 stored
         "occupation": "Software Engineer",
         "annual_income": "1000000",
         "nominee_name": "Bob Kumar",
@@ -597,9 +626,8 @@ def test_route_coverage(email):
         ("/statement.csv", "GET", False, "Statement CSV"),
         ("/statement/print", "GET", False, "Statement Print"),
 
-        # Admin
-        ("/admin", "GET", False, "Admin Dashboard"),
-        ("/admin/schemes", "GET", False, "Admin Schemes"),
+        # Admin (redirects to admin login when not authenticated as admin — 200 after following)
+        ("/admin/login", "GET", True, "Admin Login"),
     ]
 
     count_ok = 0

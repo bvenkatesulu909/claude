@@ -34,6 +34,7 @@
     </dl>
     {% if loan.status == 'ACTIVE' %}
     <form method="post" action="{{ url_for('pay_emi', loan_id=loan.id) }}" style="margin-top:6px">
+      {{ csrf_field() }}
       <button class="btn btn-primary btn-block" type="submit">Pay next EMI · {{ loan.emi_paise | inr }}</button>
     </form>
     {% else %}
