@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}KYC & Personal Details · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-wrap" style="max-width:620px">
+  <div class="card">
+    <h2>Account holder information (KYC)</h2>
+    <div class="sub">Complete your Know-Your-Customer details. Fields marked * are
+      required to verify KYC and to apply for loans.</div>
+    <form method="post">
+      <div class="two-col">
+        <div class="form-row">
+          <label>Date of birth *</label>
+          <input type="date" name="dob" value="{{ profile.dob if profile else '' }}">
+        </div>
+        <div class="form-row">
+          <label>Gender</label>
+          <select name="gender">
+            {% set g = profile.gender if profile else '' %}
+            <option value="" {{ 'selected' if not g }}>Prefer not to say</option>
+            <option {{ 'selected' if g == 'Male' }}>Male</option>
+            <option {{ 'selected' if g == 'Female' }}>Female</option>
+            <option {{ 'selected' if g == 'Other' }}>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Address *</label>
+        <input name="address" value="{{ profile.address if profile else '' }}" placeholder="House no, street, area">
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>City</label>
+          <input name="city" value="{{ profile.city if profile else '' }}"></div>
+        <div class="form-row"><label>State</label>
+          <input name="state" value="{{ profile.state if profile else '' }}"></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>PIN code</label>
+          <input name="pincode" value="{{ profile.pincode if profile else '' }}"></div>
+        <div class="form-row"><label>Occupation</label>
+          <input name="occupation" value="{{ profile.occupation if profile else '' }}"></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label>PAN *</label>
+          <input name="pan" maxlength="10" style="text-transform:uppercase"
+                 value="{{ profile.pan if profile else '' }}" placeholder="ABCDE1234F">
+        </div>
+        <div class="form-row">
+          <label>Aadhaar number *</label>
+          <input name="aadhaar" inputmode="numeric" placeholder="12-digit (only last 4 stored)"
+                 value="{{ ('XXXXXXXX' ~ profile.aadhaar_last4) if profile and profile.aadhaar_last4 else '' }}">
+          <div class="hint">For your privacy, only the last 4 digits are stored.</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label>Annual income (₹) *</label>
+          <input type="number" name="annual_income" min="0" step="1000"
+                 value="{{ (profile.annual_income_paise / 100) | round(0, 'floor') | int if profile and profile.annual_income_paise else '' }}">
+          <div class="hint">Used to assess loan eligibility.</div>
+        </div>
+        <div class="form-row">
+          <label>Nominee name</label>
+          <input name="nominee_name" value="{{ profile.nominee_name if profile else '' }}">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Nominee relationship</label>
+        <input name="nominee_relation" value="{{ profile.nominee_relation if profile else '' }}"
+               placeholder="e.g. Spouse, Parent, Child">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Save details</button>
+    </form>
+    <div class="form-foot"><a href="{{ url_for('profile') }}">← Back to profile</a></div>
+  </div>
+</div>
+{% endblock %}

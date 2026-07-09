@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}My Deposits · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2 style="margin:0">Fixed &amp; Recurring Deposits</h2>
+    <div class="sub muted">Savings a/c {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('open_deposit') }}">+ Open new deposit</a>
+</div>
+
+<div class="stat-grid" style="margin:6px 0 22px">
+  <div class="stat-card"><div class="stat-ico">📈</div><div class="stat-label">Invested (active)</div>
+    <div class="stat-value">{{ summary.deposit_invested | inr }}</div>
+    <div class="stat-note">{{ summary.deposit_count }} active deposit(s)</div></div>
+  <div class="stat-card"><div class="stat-ico">🎯</div><div class="stat-label">Projected at maturity</div>
+    <div class="stat-value">{{ summary.deposit_maturity | inr }}</div>
+    <div class="stat-note">Total value on maturity</div></div>
+</div>
+
+{% if deposits %}
+<div class="grid" style="gap:16px">
+  {% for d in deposits %}
+  <div class="card deposit-card">
+    <div class="deposit-head">
+      <div>
+        <span class="cat-tag cat-{{ d.deposit_type|lower }}">{{ d.deposit_type }}</span>
+        <b style="margin-left:8px">{{ d.scheme_name }}</b>
+      </div>
+      <span class="status status-{{ d.status|lower }}">{{ d.status }}</span>
+    </div>
+    <div class="deposit-grid">
+      <div><span class="muted">{{ 'Monthly installment' if d.deposit_type == 'RD' else 'Principal' }}</span>
+           <b>{{ d.principal_paise | inr }}</b></div>
+      <div><span class="muted">Interest rate</span><b>{{ '%.2f'|format(d.interest_rate) }}% p.a.</b></div>
+      <div><span class="muted">Tenure</span><b>{{ d.tenure_months }} months</b></div>
+      <div><span class="muted">Maturity value</span><b class="amt-credit">{{ d.maturity_paise | inr }}</b></div>
+      <div><span class="muted">Interest earned</span><b class="amt-credit">{{ d.interest_paise | inr }}</b></div>
+      <div><span class="muted">Maturity date</span><b>{{ d.maturity_date }}</b></div>
+    </div>
+    {% if d.deposit_type == 'RD' and d.status == 'ACTIVE' %}
+    <div class="progress-wrap">
+      <div class="progress"><div class="progress-bar" style="width:{{ (d.installments_paid / d.tenure_months * 100)|round(0) }}%"></div></div>
+      <span class="muted">{{ d.installments_paid }}/{{ d.tenure_months }} installments paid</span>
+    </div>
+    {% endif %}
+    {% if d.status == 'ACTIVE' %}
+    <div class="deposit-actions">
+      {% if d.deposit_type == 'RD' and d.installments_paid < d.tenure_months %}
+      <form method="post" action="{{ url_for('pay_rd', dep_id=d.id) }}">
+        <button class="btn btn-primary" type="submit">Pay installment ({{ d.principal_paise | inr }})</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{{ url_for('close_deposit', dep_id=d.id) }}"
+            onsubmit="return confirm('Close this deposit and credit the proceeds to your savings account?')">
+        <button class="btn btn-light" type="submit">Close / withdraw</button>
+      </form>
+    </div>
+    {% endif %}
+    <div class="ref muted">Ref {{ d.ref_no }} · opened {{ d.start_date }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><div class="empty">You have no deposits yet.
+  <a href="{{ url_for('open_deposit') }}">Open a Fixed or Recurring Deposit →</a></div></div>
+{% endif %}
+{% endblock %}

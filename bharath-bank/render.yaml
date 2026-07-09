@@ -1,0 +1,39 @@
+# Render Blueprint for Bharath Bank of India (Flask + SQLite demo).
+# Deploy: push this repo to GitHub, then in the Render dashboard choose
+# "New +" -> "Blueprint" and point it at the repo. Render reads this file.
+#
+# NOTE ON DATA PERSISTENCE:
+#   The free tier uses an EPHEMERAL filesystem. bank.db lives on that disk,
+#   so every deploy/restart wipes it and init_db() re-creates the schema and
+#   re-seeds the reference data (users/transactions are lost). That is fine for
+#   a demo. To keep data across redeploys, attach a persistent disk — an
+#   example (paid plan) mount is included below, commented out. A disk mounted
+#   at /opt/render/project/src makes bank.db (written next to app.py in that
+#   directory) survive restarts.
+
+services:
+  - type: web
+    name: bharath-bank-of-india
+    runtime: python
+    plan: free
+    # The Flask app lives in a subfolder of the repo, so build/start run there.
+    rootDir: bharath-bank
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    envVars:
+      # Flask SECRET_KEY (read by app.py as os.environ["BBI_SECRET"]).
+      # Render generates a strong random value and keeps it stable per service.
+      - key: BBI_SECRET
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+
+    # ----------------------------------------------------------------------- #
+    # OPTIONAL — persistent storage (requires a paid instance type).
+    # Uncomment to keep bank.db across deploys/restarts. The mount path is the
+    # project source dir, which is where app.py writes bank.db (BASE_DIR).
+    # ----------------------------------------------------------------------- #
+    # disk:
+    #   name: bbi-data
+    #   mountPath: /opt/render/project/src
+    #   sizeGB: 1

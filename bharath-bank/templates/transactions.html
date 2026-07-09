@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Statement · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="section-head">
+    <div>
+      <h2>Account statement</h2>
+      <div class="sub">{{ account.account_number }} · {{ account.ifsc }} · Balance {{ account.balance_paise | inr }}</div>
+    </div>
+    <div class="filters">
+      <a href="{{ url_for('transactions', type='ALL') }}"    class="{{ 'active' if txn_filter == 'ALL' }}">All</a>
+      <a href="{{ url_for('transactions', type='CREDIT') }}" class="{{ 'active' if txn_filter == 'CREDIT' }}">Credits</a>
+      <a href="{{ url_for('transactions', type='DEBIT') }}"  class="{{ 'active' if txn_filter == 'DEBIT' }}">Debits</a>
+    </div>
+  </div>
+
+  {% if txns %}
+  <table class="txn-table">
+    <thead>
+      <tr><th>Date</th><th>Description</th><th>Ref No</th><th>Type</th><th>Amount</th><th>Balance</th></tr>
+    </thead>
+    <tbody>
+      {% for t in txns %}
+      <tr>
+        <td class="muted">{{ t.created_at[:16] }}</td>
+        <td>{{ t.description }}</td>
+        <td class="muted">{{ t.ref_no }}</td>
+        <td>
+          {% if t.txn_type == 'CREDIT' %}<span class="pill pill-credit">CREDIT</span>
+          {% else %}<span class="pill pill-debit">DEBIT</span>{% endif %}
+        </td>
+        <td class="{{ 'amt-credit' if t.txn_type == 'CREDIT' else 'amt-debit' }}">
+          {{ '+' if t.txn_type == 'CREDIT' else '−' }}{{ t.amount_paise | inr }}
+        </td>
+        <td>{{ t.balance_paise | inr }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No transactions found for this filter.</div>
+  {% endif %}
+</div>
+{% endblock %}

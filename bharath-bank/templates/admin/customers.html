@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Customers · Admin · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2 style="margin:0">Customers</h2>
+    <div class="sub muted">{{ customers|length }} registered account holder(s)</div>
+  </div>
+  <nav class="filters">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+    <a class="active" href="{{ url_for('admin.customers') }}">Customers</a>
+    <a href="{{ url_for('admin.loans') }}">Loans</a>
+    <a href="{{ url_for('admin.logout') }}">Sign out</a>
+  </nav>
+</div>
+
+<div class="card" style="overflow-x:auto">
+  {% if customers %}
+  <table class="txn-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Name</th><th>Contact</th><th>Account No.</th>
+        <th>Balance</th><th>KYC</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td class="muted">{{ c.id }}</td>
+        <td><b>{{ c.full_name }}</b></td>
+        <td class="muted">{{ c.email }}<br>{{ c.phone }}</td>
+        <td>{{ c.account_number or '—' }}</td>
+        <td>{{ (c.balance_paise or 0) | inr }}</td>
+        <td>
+          {% if c.kyc_status == 'VERIFIED' %}
+            <span class="status status-active">VERIFIED</span>
+          {% else %}
+            <span class="status status-pending">PENDING</span>
+          {% endif %}
+        </td>
+        <td><a class="btn btn-light" href="{{ url_for('admin.customer', uid=c.id) }}">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No customers have registered yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

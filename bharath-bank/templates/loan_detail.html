@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Loan {{ loan.loan_account }} · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2 style="margin:0">{{ loan.product_name }}</h2>
+    <div class="sub muted">{{ loan.loan_account }} · applied {{ loan.applied_at[:16] }}</div>
+  </div>
+  <span class="status status-{{ loan.status|lower }}">{{ loan.status }}</span>
+</div>
+
+{% if loan.status == 'REJECTED' %}
+<div class="card"><p class="muted" style="margin:0">This application was not approved.
+  <br><b>Reason:</b> {{ loan.decision_reason }}</p></div>
+{% else %}
+<div class="grid grid-2">
+  <div class="card balance-card">
+    <div class="balance-label">Outstanding principal</div>
+    <div class="balance-amount">{{ loan.outstanding_paise | inr }}</div>
+    <div class="acc-meta">
+      <div><b>{{ loan.emi_paise | inr }}</b>Monthly EMI</div>
+      <div><b>{{ loan.emis_paid }}/{{ loan.tenure_months }}</b>EMIs paid</div>
+      <div><b>{{ '%.2f'|format(loan.interest_rate) }}%</b>Interest p.a.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Loan summary</h2>
+    <dl class="kv" style="grid-template-columns:150px 1fr">
+      <dt>Loan amount</dt><dd>{{ loan.principal_paise | inr }}</dd>
+      <dt>Tenure</dt><dd>{{ loan.tenure_months }} months</dd>
+      <dt>Total interest</dt><dd>{{ loan.total_interest_paise | inr }}</dd>
+      <dt>Total payable</dt><dd>{{ loan.total_payable_paise | inr }}</dd>
+      <dt>Status</dt><dd>{{ loan.status }}</dd>
+    </dl>
+    {% if loan.status == 'ACTIVE' %}
+    <form method="post" action="{{ url_for('pay_emi', loan_id=loan.id) }}" style="margin-top:6px">
+      <button class="btn btn-primary btn-block" type="submit">Pay next EMI · {{ loan.emi_paise | inr }}</button>
+    </form>
+    {% else %}
+    <div class="chip-info" style="margin-top:8px">✔ Loan fully repaid and closed.</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card" style="margin-top:20px">
+  <h2>Amortization schedule</h2>
+  <div class="sub muted">Interest is charged on the reducing balance each month.
+    Rows already paid are highlighted.</div>
+  <div style="overflow-x:auto">
+    <table class="txn-table">
+      <thead><tr><th>#</th><th>EMI</th><th>Principal</th><th>Interest</th><th>Balance</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for r in schedule %}
+        <tr class="{{ 'row-paid' if r.emi_no <= loan.emis_paid }}">
+          <td>{{ r.emi_no }}</td>
+          <td>{{ r.emi_paise | inr }}</td>
+          <td>{{ r.principal_paise | inr }}</td>
+          <td>{{ r.interest_paise | inr }}</td>
+          <td>{{ r.outstanding_paise | inr }}</td>
+          <td>{% if r.emi_no <= loan.emis_paid %}<span class="pill pill-credit">PAID</span>
+              {% else %}<span class="pill pill-debit">DUE</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if payments %}
+<div class="card" style="margin-top:20px">
+  <h2>Payment history</h2>
+  <table class="txn-table">
+    <thead><tr><th>Date</th><th>EMI #</th><th>Amount</th><th>Principal</th><th>Interest</th><th>Ref</th></tr></thead>
+    <tbody>
+      {% for p in payments %}
+      <tr>
+        <td class="muted">{{ p.paid_at[:16] }}</td>
+        <td>{{ p.emi_no }}</td>
+        <td class="amt-debit">{{ p.amount_paise | inr }}</td>
+        <td>{{ p.principal_paise | inr }}</td>
+        <td>{{ p.interest_paise | inr }}</td>
+        <td class="muted">{{ p.ref_no }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="form-foot"><a href="{{ url_for('loans_page') }}">← Back to loans</a></div>
+{% endblock %}

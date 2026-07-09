@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Deposit · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card">
+    <h2>Deposit money</h2>
+    <div class="sub">Into {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
+    <form method="post">
+      <div class="form-row">
+        <label for="amount">Amount (₹)</label>
+        <input id="amount" name="amount" type="number" min="0.01" step="0.01" required autofocus>
+      </div>
+      <div class="form-row">
+        <label for="description">Note (optional)</label>
+        <input id="description" name="description" placeholder="Cash deposit">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Deposit</button>
+    </form>
+    <div class="form-foot"><a href="{{ url_for('dashboard') }}">← Back to dashboard</a></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Admin Login · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card">
+    <h2>Admin Console</h2>
+    <div class="sub">Restricted back-office access for {{ BANK_NAME }} staff.</div>
+    <form method="post" action="{{ url_for('admin.login') }}">
+      <div class="form-row">
+        <label for="password">Admin password</label>
+        <input type="password" id="password" name="password" autocomplete="off"
+               placeholder="Enter the shared admin password" required autofocus>
+        <div class="hint">Set via the <code>BBI_ADMIN_PASS</code> environment variable.</div>
+      </div>
+      <button class="btn btn-navy btn-block" type="submit">Sign in</button>
+    </form>
+    <div class="form-foot">Back to <a href="{{ url_for('index') }}">customer site</a></div>
+  </div>
+</div>
+{% endblock %}

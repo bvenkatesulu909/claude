@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Open an Account · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card">
+    <h2>Open your account</h2>
+    <div class="sub">It only takes a minute. Your account number is generated instantly.</div>
+    <form method="post">
+      <div class="form-row">
+        <label for="full_name">Full name</label>
+        <input id="full_name" name="full_name" required autofocus>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required>
+        </div>
+        <div class="form-row">
+          <label for="phone">Mobile number</label>
+          <input id="phone" name="phone" required>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label for="account_type">Account type</label>
+          <select id="account_type" name="account_type">
+            <option>Savings</option>
+            <option>Current</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="opening_balance">Opening deposit (₹)</label>
+          <input id="opening_balance" name="opening_balance" type="number" min="0" step="0.01" value="0">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-row">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required>
+        </div>
+        <div class="form-row">
+          <label for="confirm">Confirm password</label>
+          <input id="confirm" name="confirm" type="password" required>
+        </div>
+      </div>
+      <div class="hint">Password must be at least 6 characters.</div>
+      <button class="btn btn-primary btn-block" type="submit" style="margin-top:14px">Create Account</button>
+    </form>
+    <div class="form-foot">Already a customer? <a href="{{ url_for('login') }}">Log in</a></div>
+  </div>
+</div>
+{% endblock %}

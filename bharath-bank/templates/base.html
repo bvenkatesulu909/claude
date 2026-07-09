@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ BANK_NAME }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="tricolor-strip" aria-hidden="true">
+    <div class="band band-saffron"></div>
+    <div class="band band-white"><span class="chakra"></span></div>
+    <div class="band band-green"></div>
+  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">{{ BANK_SHORT }}</span>
+        <span class="brand-text">{{ BANK_NAME }}</span>
+      </a>
+      <nav class="nav">
+        {% if current_user %}
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('deposits_page') }}">Deposits</a>
+          <a href="{{ url_for('loans_page') }}">Loans</a>
+          <a href="{{ url_for('transfer') }}">Transfer</a>
+          <a href="{{ url_for('products') }}">Rates</a>
+          <a href="{{ url_for('profile') }}">Profile</a>
+          <a class="btn-ghost" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a href="{{ url_for('products') }}">Products &amp; Rates</a>
+          <a href="{{ url_for('login') }}">Login</a>
+          <a class="btn-solid" href="{{ url_for('register') }}">Open Account</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>{{ BANK_NAME }}</strong><br>
+        {{ BRANCH_NAME }} · IFSC {{ IFSC_CODE }}
+      </div>
+      <div class="footer-note">
+        Demonstration application · © {{ year }} · Not a real bank, holds no real money.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

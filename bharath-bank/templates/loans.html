@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}My Loans · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2 style="margin:0">My loans</h2>
+    <div class="sub muted">Savings a/c {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('apply_loan') }}">+ Apply for a loan</a>
+</div>
+
+{% if not profile or not profile.annual_income_paise %}
+<div class="flash flash-warning">🪪 Add your annual income in
+  <a href="{{ url_for('kyc') }}"><b>KYC</b></a> to become eligible for loans.</div>
+{% endif %}
+
+{% if loans %}
+<div class="grid" style="gap:16px">
+  {% for l in loans %}
+  <div class="card">
+    <div class="deposit-head">
+      <div><b>{{ l.product_name }}</b>
+        <span class="muted" style="margin-left:8px">{{ l.loan_account }}</span></div>
+      <span class="status status-{{ l.status|lower }}">{{ l.status }}</span>
+    </div>
+    {% if l.status in ['ACTIVE', 'CLOSED'] %}
+    <div class="deposit-grid">
+      <div><span class="muted">Loan amount</span><b>{{ l.principal_paise | inr }}</b></div>
+      <div><span class="muted">Rate</span><b>{{ '%.2f'|format(l.interest_rate) }}% p.a.</b></div>
+      <div><span class="muted">EMI</span><b>{{ l.emi_paise | inr }}</b></div>
+      <div><span class="muted">Outstanding</span><b class="amt-debit">{{ l.outstanding_paise | inr }}</b></div>
+      <div><span class="muted">Paid</span><b>{{ l.emis_paid }}/{{ l.tenure_months }} EMIs</b></div>
+      <div><span class="muted">Total interest</span><b>{{ l.total_interest_paise | inr }}</b></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress"><div class="progress-bar" style="width:{{ (l.emis_paid / l.tenure_months * 100)|round(0) }}%"></div></div>
+      <span class="muted">{{ l.emis_paid }}/{{ l.tenure_months }} EMIs paid</span>
+    </div>
+    <div class="deposit-actions">
+      <a class="btn btn-light" href="{{ url_for('loan_detail', loan_id=l.id) }}">View schedule</a>
+      {% if l.status == 'ACTIVE' %}
+      <form method="post" action="{{ url_for('pay_emi', loan_id=l.id) }}">
+        <button class="btn btn-primary" type="submit">Pay EMI ({{ l.emi_paise | inr }})</button>
+      </form>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="muted" style="margin:10px 0 0">Requested {{ l.principal_paise | inr }} ·
+       {{ l.decision_reason }}</p>
+    {% endif %}
+    <div class="ref muted">Applied {{ l.applied_at[:16] }}{% if l.purpose %} · {{ l.purpose }}{% endif %}</div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><div class="empty">You have no loans yet.
+  <a href="{{ url_for('apply_loan') }}">Apply for a loan →</a></div></div>
+{% endif %}
+
+<h2 style="margin:28px 0 6px">Available loan products</h2>
+<div class="card" style="overflow-x:auto">
+  <table class="txn-table">
+    <thead><tr><th>Product</th><th>Rate</th><th>Amount range</th><th>Max tenure</th><th></th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td><b>{{ p.name }}</b></td>
+        <td><span class="rate-badge">{{ '%.2f'|format(p.interest_rate) }}%</span></td>
+        <td>{{ p.min_amount_paise | inr }} – {{ p.max_amount_paise | inr }}</td>
+        <td>{{ p.max_tenure_months }} m</td>
+        <td><a class="btn btn-light" href="{{ url_for('apply_loan') }}">Apply</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

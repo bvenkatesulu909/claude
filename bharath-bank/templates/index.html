@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Banking that puts Bharath first.</h1>
+  <p>Open a savings account in minutes, transfer money instantly to anyone in
+     {{ BANK_NAME }}, and track every rupee — all from one secure dashboard.</p>
+  <div class="cta">
+    {% if current_user %}
+      <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+    {% else %}
+      <a class="btn btn-primary" href="{{ url_for('register') }}">Open a Free Account</a>
+      <a class="btn btn-light" href="{{ url_for('login') }}">Internet Banking Login</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="features">
+  <div class="feature">
+    <div class="ico">💸</div>
+    <h3>Instant Transfers</h3>
+    <p>Send money to any {{ BANK_SHORT }} account number in real time with a shared
+       reference number for both parties.</p>
+  </div>
+  <div class="feature">
+    <div class="ico">🔒</div>
+    <h3>Bank-grade Security</h3>
+    <p>Passwords are salted and hashed, and every session is protected. Your
+       balance is only ever visible to you.</p>
+  </div>
+  <div class="feature">
+    <div class="ico">📊</div>
+    <h3>Full Statement</h3>
+    <p>Every deposit, withdrawal and transfer is recorded with a running balance
+       you can filter and review anytime.</p>
+  </div>
+</div>
+
+<div class="card" style="margin-top:28px">
+  <h2>Why {{ BANK_NAME }}?</h2>
+  <p class="muted">
+    A demonstration internet-banking platform built with Flask &amp; SQLite —
+    accounts, double-entry transfers, and a real-time ledger. Branch:
+    <b>{{ BRANCH_NAME }}</b> · IFSC <b>{{ IFSC_CODE }}</b>.
+  </p>
+</div>
+{% endblock %}

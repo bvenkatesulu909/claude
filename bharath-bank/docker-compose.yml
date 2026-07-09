@@ -1,0 +1,22 @@
+services:
+  bank:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bharath-bank:latest
+    ports:
+      - "5055:8000"
+    environment:
+      - BBI_SECRET=${BBI_SECRET:-change-me-in-prod}
+    volumes:
+      # Named volume over /app so bank.db (and any files the app writes)
+      # survive container recreation. NOTE: on the very first `up`, Docker
+      # seeds this volume from the image's /app contents; after that, code
+      # changes require `docker compose build` AND `docker compose down -v`
+      # (or a bind mount instead) to be picked up, since the volume shadows
+      # /app afterwards.
+      - bank_data:/app
+    restart: unless-stopped
+
+volumes:
+  bank_data:

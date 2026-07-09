@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="grid grid-2">
+  <div class="card balance-card">
+    <div class="balance-label">Available Balance · {{ account.account_type }}</div>
+    <div class="balance-amount">{{ account.balance_paise | inr }}</div>
+    <div class="acc-meta">
+      <div><b>{{ account.account_number }}</b>Account Number</div>
+      <div><b>{{ account.ifsc }}</b>IFSC Code</div>
+      <div><b>{{ account.status }}</b>Status</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Quick actions</h2>
+    <div class="sub">What would you like to do?</div>
+    <div class="actions actions-6">
+      <a class="action" href="{{ url_for('deposit') }}"><span class="ico">➕</span>Deposit</a>
+      <a class="action" href="{{ url_for('withdraw') }}"><span class="ico">➖</span>Withdraw</a>
+      <a class="action" href="{{ url_for('transfer') }}"><span class="ico">↗</span>Transfer</a>
+      <a class="action" href="{{ url_for('open_deposit') }}"><span class="ico">📈</span>Open FD/RD</a>
+      <a class="action" href="{{ url_for('apply_loan') }}"><span class="ico">🏦</span>Apply Loan</a>
+      <a class="action" href="{{ url_for('kyc') }}"><span class="ico">🪪</span>Update KYC</a>
+    </div>
+  </div>
+</div>
+
+{% if not profile or profile.kyc_status != 'VERIFIED' %}
+<div class="flash flash-warning" style="margin-top:20px">
+  🪪 Your KYC is incomplete. <a href="{{ url_for('kyc') }}"><b>Complete your KYC</b></a>
+  to unlock loans and higher limits.
+</div>
+{% endif %}
+
+<div class="stat-grid" style="margin-top:20px">
+  <div class="stat-card">
+    <div class="stat-ico">📈</div>
+    <div class="stat-label">Active Deposits</div>
+    <div class="stat-value">{{ summary.deposit_invested | inr }}</div>
+    <div class="stat-note">{{ summary.deposit_count }} deposit(s) · matures to {{ summary.deposit_maturity | inr }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">🏦</div>
+    <div class="stat-label">Loan Outstanding</div>
+    <div class="stat-value">{{ summary.loan_outstanding | inr }}</div>
+    <div class="stat-note">{{ summary.loan_count }} active loan(s)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">💼</div>
+    <div class="stat-label">Net Position</div>
+    {% set net = account.balance_paise + summary.deposit_invested - summary.loan_outstanding %}
+    <div class="stat-value">{{ net | inr }}</div>
+    <div class="stat-note">Savings + deposits − loans</div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:20px">
+  <div class="section-head">
+    <h2>Recent activity</h2>
+    <a class="muted" href="{{ url_for('transactions') }}">View full statement →</a>
+  </div>
+  {% if txns %}
+  <table class="txn-table">
+    <thead>
+      <tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Balance</th></tr>
+    </thead>
+    <tbody>
+      {% for t in txns %}
+      <tr>
+        <td class="muted">{{ t.created_at[:16] }}</td>
+        <td>{{ t.description }}</td>
+        <td>
+          {% if t.txn_type == 'CREDIT' %}<span class="pill pill-credit">CREDIT</span>
+          {% else %}<span class="pill pill-debit">DEBIT</span>{% endif %}
+        </td>
+        <td class="{{ 'amt-credit' if t.txn_type == 'CREDIT' else 'amt-debit' }}">
+          {{ '+' if t.txn_type == 'CREDIT' else '−' }}{{ t.amount_paise | inr }}
+        </td>
+        <td>{{ t.balance_paise | inr }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No transactions yet. Make a deposit to get started.</div>
+  {% endif %}
+</div>
+{% endblock %}

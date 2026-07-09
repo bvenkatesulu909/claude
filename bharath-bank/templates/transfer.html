@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Transfer · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card">
+    <h2>Transfer money</h2>
+    <div class="sub">From {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
+    <form method="post">
+      <div class="form-row">
+        <label for="to_account">Payee account number ({{ BANK_SHORT }})</label>
+        <input id="to_account" name="to_account" required autofocus placeholder="e.g. 172912345678">
+        <div class="hint">Must be a {{ BANK_NAME }} account number.</div>
+      </div>
+      <div class="form-row">
+        <label for="amount">Amount (₹)</label>
+        <input id="amount" name="amount" type="number" min="0.01" step="0.01" required>
+      </div>
+      <div class="form-row">
+        <label for="description">Note (optional)</label>
+        <input id="description" name="description" placeholder="Fund transfer">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Send Money</button>
+    </form>
+    <div class="form-foot"><a href="{{ url_for('dashboard') }}">← Back to dashboard</a></div>
+  </div>
+</div>
+{% endblock %}

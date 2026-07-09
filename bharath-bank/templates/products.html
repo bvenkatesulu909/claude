@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Products &amp; Interest Rates · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="hero" style="padding:34px 34px">
+  <h1 style="font-size:1.9rem">Products &amp; interest rates</h1>
+  <p>Everything {{ BANK_NAME }} offers — deposits, savings and loans — with live
+     rates from our core banking system. Effective {{ year }}.</p>
+</div>
+
+<h2 style="margin:28px 0 6px">Deposit &amp; savings schemes</h2>
+<div class="sub muted" style="margin-bottom:14px">Grow your money with guaranteed returns.</div>
+<div class="product-grid">
+  {% for s in schemes %}
+  <div class="card product-card">
+    <div class="product-top">
+      <span class="cat-tag cat-{{ s.category|lower }}">{{ s.category }}</span>
+      {% if s.highlight %}<span class="highlight">{{ s.highlight }}</span>{% endif %}
+    </div>
+    <h3>{{ s.name }}</h3>
+    <div class="rate">{{ '%.2f'|format(s.interest_rate) }}<span>% p.a.</span></div>
+    <p class="muted">{{ s.description }}</p>
+    <div class="product-meta">
+      {% if s.min_tenure_months %}<span>Tenure {{ s.min_tenure_months }}–{{ s.max_tenure_months }} m</span>{% endif %}
+      {% if s.min_amount_paise %}<span>Min {{ s.min_amount_paise | inr }}</span>{% endif %}
+    </div>
+    {% if s.openable %}
+      {% if current_user %}
+        <a class="btn btn-primary btn-block" href="{{ url_for('open_deposit') }}">Open now</a>
+      {% else %}
+        <a class="btn btn-primary btn-block" href="{{ url_for('register') }}">Open account to invest</a>
+      {% endif %}
+    {% else %}
+      <div class="chip-info">Available at branch</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<h2 style="margin:34px 0 6px">Loan products</h2>
+<div class="sub muted" style="margin-bottom:14px">Competitive rates, instant in-principle decisions.</div>
+<div class="card" style="overflow-x:auto">
+  <table class="txn-table">
+    <thead>
+      <tr><th>Product</th><th>Interest (p.a.)</th><th>Amount range</th>
+          <th>Max tenure</th><th>Processing fee</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for p in loan_products %}
+      <tr>
+        <td><b>{{ p.name }}</b><div class="muted" style="font-size:.85rem">{{ p.description }}</div></td>
+        <td><span class="rate-badge">{{ '%.2f'|format(p.interest_rate) }}%</span></td>
+        <td>{{ p.min_amount_paise | inr }} – {{ p.max_amount_paise | inr }}</td>
+        <td>{{ p.max_tenure_months }} months</td>
+        <td>{{ '%.2f'|format(p.processing_fee_pct) }}%</td>
+        <td>
+          {% if current_user %}
+            <a class="btn btn-light" href="{{ url_for('apply_loan') }}">Apply</a>
+          {% else %}
+            <a class="btn btn-light" href="{{ url_for('login') }}">Login to apply</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top:22px">
+  <p class="muted" style="margin:0">All rates are indicative and for demonstration only.
+    {{ BANK_NAME }} · {{ BRANCH_NAME }} · IFSC {{ IFSC_CODE }}.</p>
+</div>
+{% endblock %}

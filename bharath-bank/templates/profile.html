@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Profile · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <h2 style="margin:0">My profile</h2>
+  <a class="btn btn-light" href="{{ url_for('kyc') }}">Edit KYC details</a>
+</div>
+
+<div class="grid grid-2" style="margin-top:8px">
+  <div class="card">
+    <h2>Account holder</h2>
+    <div class="sub">Your personal details
+      {% if profile and profile.kyc_status == 'VERIFIED' %}
+        <span class="status status-active">KYC Verified</span>
+      {% else %}
+        <span class="status status-pending">KYC Pending</span>
+      {% endif %}
+    </div>
+    <dl class="kv">
+      <dt>Full name</dt><dd>{{ current_user.full_name }}</dd>
+      <dt>Email</dt><dd>{{ current_user.email }}</dd>
+      <dt>Mobile</dt><dd>{{ current_user.phone }}</dd>
+      <dt>Date of birth</dt><dd>{{ profile.dob if profile and profile.dob else '—' }}</dd>
+      <dt>Gender</dt><dd>{{ profile.gender if profile and profile.gender else '—' }}</dd>
+      <dt>PAN</dt><dd>{{ profile.pan if profile and profile.pan else '—' }}</dd>
+      <dt>Aadhaar</dt><dd>{{ ('XXXX XXXX ' ~ profile.aadhaar_last4) if profile and profile.aadhaar_last4 else '—' }}</dd>
+      <dt>Occupation</dt><dd>{{ profile.occupation if profile and profile.occupation else '—' }}</dd>
+      <dt>Annual income</dt><dd>{{ (profile.annual_income_paise | inr) if profile and profile.annual_income_paise else '—' }}</dd>
+      <dt>Customer since</dt><dd>{{ current_user.created_at[:10] }}</dd>
+    </dl>
+  </div>
+  <div class="card">
+    <h2>Account &amp; address</h2>
+    <div class="sub">{{ BANK_NAME }}</div>
+    <dl class="kv">
+      <dt>Account number</dt><dd>{{ account.account_number }}</dd>
+      <dt>Account type</dt><dd>{{ account.account_type }}</dd>
+      <dt>IFSC code</dt><dd>{{ account.ifsc }}</dd>
+      <dt>Branch</dt><dd>{{ BRANCH_NAME }}</dd>
+      <dt>Balance</dt><dd>{{ account.balance_paise | inr }}</dd>
+      <dt>Status</dt><dd>{{ account.status }}</dd>
+      <dt>Address</dt><dd>
+        {% if profile and profile.address %}
+          {{ profile.address }}{% if profile.city %}, {{ profile.city }}{% endif %}
+          {% if profile.state %}, {{ profile.state }}{% endif %}
+          {% if profile.pincode %} - {{ profile.pincode }}{% endif %}
+        {% else %}—{% endif %}
+      </dd>
+      <dt>Nominee</dt><dd>
+        {% if profile and profile.nominee_name %}
+          {{ profile.nominee_name }}{% if profile.nominee_relation %} ({{ profile.nominee_relation }}){% endif %}
+        {% else %}—{% endif %}
+      </dd>
+    </dl>
+  </div>
+</div>
+{% endblock %}

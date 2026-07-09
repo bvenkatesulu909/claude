@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2 style="margin:0">Admin Console</h2>
+    <div class="sub muted">Bank-wide overview · {{ BRANCH_NAME }}</div>
+  </div>
+  <nav class="filters">
+    <a class="active" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin.customers') }}">Customers</a>
+    <a href="{{ url_for('admin.loans') }}">Loans</a>
+    <a href="{{ url_for('admin.logout') }}">Sign out</a>
+  </nav>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-ico">👥</div>
+    <div class="stat-label">Customers</div>
+    <div class="stat-value">{{ customer_count }}</div>
+    <div class="stat-note">Registered account holders</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">🏦</div>
+    <div class="stat-label">Total Deposits (Balances)</div>
+    <div class="stat-value">{{ total_balance | inr }}</div>
+    <div class="stat-note">Across all customer accounts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">📈</div>
+    <div class="stat-label">Active Term Deposits</div>
+    <div class="stat-value">{{ active_dep.invested | inr }}</div>
+    <div class="stat-note">{{ active_dep.c }} deposit(s) · matures to {{ active_dep.maturity | inr }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">💳</div>
+    <div class="stat-label">Active Loans Outstanding</div>
+    <div class="stat-value">{{ active_loans.outstanding | inr }}</div>
+    <div class="stat-note">{{ active_loans.c }} active loan(s)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-ico">⏳</div>
+    <div class="stat-label">Pending Loan Applications</div>
+    <div class="stat-value">{{ pending_loans }}</div>
+    <div class="stat-note">
+      {% if pending_loans %}<a href="{{ url_for('admin.loans') }}">Review now →</a>
+      {% else %}Nothing awaiting a decision{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:20px">
+  <div class="section-head">
+    <h2 style="margin:0">Quick links</h2>
+  </div>
+  <div class="actions actions-6">
+    <a class="action" href="{{ url_for('admin.customers') }}"><span class="ico">👥</span>All customers</a>
+    <a class="action" href="{{ url_for('admin.loans') }}"><span class="ico">🏦</span>Loan book</a>
+    <a class="action" href="{{ url_for('index') }}"><span class="ico">🌐</span>Customer site</a>
+  </div>
+</div>
+{% endblock %}

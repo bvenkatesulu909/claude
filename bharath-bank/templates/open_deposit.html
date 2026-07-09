@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Open a Deposit · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-wrap" style="max-width:560px">
+  <div class="card">
+    <h2>Open a Fixed / Recurring Deposit</h2>
+    <div class="sub">From savings a/c {{ account.account_number }} · Balance {{ account.balance_paise | inr }}</div>
+    <form method="post">
+      <div class="form-row">
+        <label>Scheme</label>
+        <select name="scheme_code" id="scheme" required>
+          {% for s in schemes %}
+          <option value="{{ s.code }}"
+                  data-cat="{{ s.category }}" data-rate="{{ s.interest_rate }}"
+                  data-min="{{ s.min_tenure_months }}" data-max="{{ s.max_tenure_months }}"
+                  data-amt="{{ s.min_amount_paise }}">
+            {{ s.name }} — {{ '%.2f'|format(s.interest_rate) }}% ({{ s.category }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label id="amt-label">Amount (₹)</label>
+        <input type="number" name="amount" id="amount" min="1" step="0.01" required>
+        <div class="hint" id="amt-hint"></div>
+      </div>
+      <div class="form-row">
+        <label>Tenure (months)</label>
+        <input type="number" name="tenure_months" id="tenure" min="1" step="1" required>
+        <div class="hint" id="tenure-hint"></div>
+      </div>
+
+      <div class="estimate" id="estimate">
+        <div><span class="muted">You invest</span><b id="e-invest">—</b></div>
+        <div><span class="muted">Interest earned</span><b id="e-interest" class="amt-credit">—</b></div>
+        <div><span class="muted">Maturity value</span><b id="e-maturity" class="amt-credit">—</b></div>
+      </div>
+
+      <button class="btn btn-primary btn-block" type="submit" style="margin-top:14px">Open deposit</button>
+    </form>
+    <div class="form-foot"><a href="{{ url_for('deposits_page') }}">← Back to deposits</a></div>
+  </div>
+</div>
+
+<script>
+  const scheme = document.getElementById('scheme');
+  const amount = document.getElementById('amount');
+  const tenure = document.getElementById('tenure');
+
+  function inr(paise) {
+    const r = (paise/100);
+    return '₹' + r.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+  function fdMaturity(p, rate, m) { return Math.round(p * Math.pow(1 + rate/400, m/3)); }
+  function rdMaturity(inst, rate, m) {
+    const i = Math.pow(1 + rate/400, 1/3) - 1;
+    if (i === 0) return inst * m;
+    return Math.round(inst * (1+i) * (Math.pow(1+i, m) - 1) / i);
+  }
+  function recalc() {
+    const opt = scheme.options[scheme.selectedIndex];
+    const cat = opt.dataset.cat, rate = parseFloat(opt.dataset.rate);
+    const minA = parseInt(opt.dataset.amt || '0');
+    document.getElementById('amt-label').textContent =
+      cat === 'RD' ? 'Monthly installment (₹)' : 'Deposit amount (₹)';
+    document.getElementById('amt-hint').textContent =
+      minA ? ('Minimum ' + inr(minA) + (cat === 'RD' ? ' per month' : '')) : '';
+    document.getElementById('tenure-hint').textContent =
+      'Allowed ' + opt.dataset.min + '–' + opt.dataset.max + ' months';
+
+    const amtP = Math.round((parseFloat(amount.value) || 0) * 100);
+    const m = parseInt(tenure.value) || 0;
+    const est = document.getElementById('estimate');
+    if (amtP > 0 && m > 0) {
+      const invested = cat === 'RD' ? amtP * m : amtP;
+      const maturity = cat === 'RD' ? rdMaturity(amtP, rate, m) : fdMaturity(amtP, rate, m);
+      document.getElementById('e-invest').textContent = inr(invested);
+      document.getElementById('e-interest').textContent = inr(maturity - invested);
+      document.getElementById('e-maturity').textContent = inr(maturity);
+      est.style.display = 'grid';
+    } else { est.style.display = 'none'; }
+  }
+  scheme.addEventListener('change', recalc);
+  amount.addEventListener('input', recalc);
+  tenure.addEventListener('input', recalc);
+  recalc();
+</script>
+{% endblock %}

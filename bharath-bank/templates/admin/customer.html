@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ user.full_name }} · Admin · {{ BANK_NAME }}{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2 style="margin:0">{{ user.full_name }}</h2>
+    <div class="sub muted">
+      Customer #{{ user.id }} · {{ user.email }} · {{ user.phone }}
+      · Joined {{ user.created_at[:10] }}
+      {% if profile and profile.kyc_status == 'VERIFIED' %}
+        · <span class="status status-active">KYC VERIFIED</span>
+      {% else %}
+        · <span class="status status-pending">KYC PENDING</span>
+      {% endif %}
+    </div>
+  </div>
+  <a class="btn btn-light" href="{{ url_for('admin.customers') }}">← All customers</a>
+</div>
+
+<!-- Accounts -->
+<div class="card">
+  <h2>Accounts</h2>
+  {% if accounts %}
+  <table class="txn-table">
+    <thead>
+      <tr><th>Account No.</th><th>Type</th><th>IFSC</th><th>Balance</th><th>Status</th><th>Opened</th></tr>
+    </thead>
+    <tbody>
+      {% for a in accounts %}
+      <tr>
+        <td><b>{{ a.account_number }}</b></td>
+        <td>{{ a.account_type }}</td>
+        <td class="muted">{{ a.ifsc }}</td>
+        <td>{{ a.balance_paise | inr }}</td>
+        <td><span class="status status-{{ a.status|lower }}">{{ a.status }}</span></td>
+        <td class="muted">{{ a.created_at[:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No accounts.</div>{% endif %}
+</div>
+
+<!-- Deposits -->
+<div class="card" style="margin-top:20px">
+  <h2>Deposits</h2>
+  {% if deposits %}
+  <table class="txn-table">
+    <thead>
+      <tr><th>Scheme</th><th>Type</th><th>Principal</th><th>Maturity</th><th>Matures on</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% for d in deposits %}
+      <tr>
+        <td><b>{{ d.scheme_name }}</b></td>
+        <td>{{ d.deposit_type }}</td>
+        <td>{{ d.principal_paise | inr }}</td>
+        <td>{{ d.maturity_paise | inr }}</td>
+        <td class="muted">{{ d.maturity_date }}</td>
+        <td><span class="status status-{{ d.status|lower }}">{{ d.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No deposits.</div>{% endif %}
+</div>
+
+<!-- Loans -->
+<div class="card" style="margin-top:20px">
+  <h2>Loans</h2>
+  {% if loans %}
+  <table class="txn-table">
+    <thead>
+      <tr><th>Product</th><th>Loan A/c</th><th>Principal</th><th>EMI</th><th>Outstanding</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% for l in loans %}
+      <tr>
+        <td><b>{{ l.product_name }}</b></td>
+        <td class="muted">{{ l.loan_account }}</td>
+        <td>{{ l.principal_paise | inr }}</td>
+        <td>{{ l.emi_paise | inr }}</td>
+        <td>{{ l.outstanding_paise | inr }}</td>
+        <td><span class="status status-{{ l.status|lower }}">{{ l.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No loans.</div>{% endif %}
+</div>
+
+<!-- Recent transactions -->
+<div class="card" style="margin-top:20px">
+  <h2>Recent transactions</h2>
+  <div class="sub">Latest 15 across all of this customer's accounts</div>
+  {% if txns %}
+  <table class="txn-table">
+    <thead>
+      <tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Balance</th></tr>
+    </thead>
+    <tbody>
+      {% for t in txns %}
+      <tr>
+        <td class="muted">{{ t.created_at[:16] }}</td>
+        <td>{{ t.description }}</td>
+        <td>
+          {% if t.txn_type == 'CREDIT' %}<span class="pill pill-credit">CREDIT</span>
+          {% else %}<span class="pill pill-debit">DEBIT</span>{% endif %}
+        </td>
+        <td class="{{ 'amt-credit' if t.txn_type == 'CREDIT' else 'amt-debit' }}">
+          {{ '+' if t.txn_type == 'CREDIT' else '−' }}{{ t.amount_paise | inr }}
+        </td>
+        <td>{{ t.balance_paise | inr }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<div class="empty">No transactions.</div>{% endif %}
+</div>
+{% endblock %}
