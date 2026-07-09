@@ -15,6 +15,10 @@ from app import app, init_db
 # Ensure tables exist and reference data is seeded before serving traffic.
 init_db()
 
+# Register admin blueprint (late import to avoid circular dependency).
+from admin import admin_bp
+app.register_blueprint(admin_bp)
+
 # Gunicorn looks for "app" (as in `gunicorn wsgi:app`); many hosts default to
 # "application". Expose both so either convention works.
 application = app

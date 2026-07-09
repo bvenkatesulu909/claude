@@ -17,11 +17,12 @@ from datetime import datetime, date
 
 from flask import (
     Flask, g, render_template, request, redirect, url_for,
-    session, flash, jsonify, abort,
+    session, flash, jsonify, abort, Response,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import finance
+from statement_export import statement_rows, to_csv, to_printable_html
 
 # --------------------------------------------------------------------------- #
 # Configuration
@@ -1044,6 +1045,48 @@ def api_balance():
 
 
 # --------------------------------------------------------------------------- #
+# Account statement export
+# --------------------------------------------------------------------------- #
+def _statement_context():
+    """Shared helper: resolve the current account, date filters and rows."""
+    account = get_primary_account(session["user_id"])
+    start = request.args.get("start") or None
+    end = request.args.get("end") or None
+    rows = statement_rows(get_db(), account["id"], start=start, end=end)
+    bank_meta = {
+        "name": BANK_NAME,
+        "ifsc": IFSC_CODE,
+        "branch": BRANCH_NAME,
+        "period": (f"{start or 'Beginning'} to {end or 'Present'}"),
+    }
+    return account, rows, bank_meta
+
+
+@app.route("/statement.csv")
+@login_required
+def statement_csv():
+    account, rows, bank_meta = _statement_context()
+    csv_text = to_csv(rows, account, bank_meta)
+    filename = f"statement_{account['account_number']}.csv"
+    return Response(
+        csv_text,
+        mimetype="text/csv",
+        headers={
+            "Content-Type": "text/csv; charset=utf-8",
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
+
+
+@app.route("/statement/print")
+@login_required
+def statement_print():
+    account, rows, bank_meta = _statement_context()
+    html_text = to_printable_html(rows, account, bank_meta)
+    return Response(html_text, mimetype="text/html")
+
+
+# --------------------------------------------------------------------------- #
 # Core transaction engine
 # --------------------------------------------------------------------------- #
 def _post_transaction(account_id, txn_type, amount_paise, category, description,
@@ -1076,6 +1119,9 @@ def _post_transaction(account_id, txn_type, amount_paise, category, description,
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
     init_db()
+    # Register admin blueprint (late import to avoid circular dependency with admin.py)
+    from admin import admin_bp
+    app.register_blueprint(admin_bp)
     print(f"  {BANK_NAME}  —  internet banking server")
     print(f"  Database: {DB_FILE}")
     port = int(os.environ.get("PORT", 5055))

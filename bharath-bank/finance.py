@@ -98,7 +98,9 @@ def amortization_schedule(principal_paise, annual_rate_pct, tenure_months, emi_p
     if emi_paise is None:
         emi_paise = loan_emi_paise(principal_paise, annual_rate_pct, tenure_months)
     outstanding = int(principal_paise)
+    original_principal = int(principal_paise)
     rows = []
+    principal_repaid = 0
     for k in range(1, int(tenure_months) + 1):
         interest, principal, pay, outstanding = emi_split(outstanding, annual_rate_pct, emi_paise)
         rows.append({
@@ -108,8 +110,17 @@ def amortization_schedule(principal_paise, annual_rate_pct, tenure_months, emi_p
             "principal_paise": principal,
             "outstanding_paise": outstanding,
         })
+        principal_repaid += principal
         if outstanding <= 0:
             break
+
+    # Adjust final principal to ensure sum equals original principal exactly (accounting integrity)
+    if rows and principal_repaid != original_principal:
+        adjustment = original_principal - principal_repaid
+        rows[-1]["principal_paise"] += adjustment
+        rows[-1]["emi_paise"] = rows[-1]["interest_paise"] + rows[-1]["principal_paise"]
+        rows[-1]["outstanding_paise"] -= adjustment
+
     return rows
 
 
