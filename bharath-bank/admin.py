@@ -19,7 +19,6 @@ site and touches the very same ``bank.db``.
 
 import os
 import functools
-from datetime import datetime
 
 from flask import (
     Blueprint, render_template, request, redirect, url_for,
@@ -27,7 +26,7 @@ from flask import (
 )
 
 # Reuse the exact helpers already defined by the main application.
-from app import get_db, fmt_inr
+from app import get_db, fmt_inr, now_str
 
 # --------------------------------------------------------------------------- #
 # Blueprint + configuration
@@ -36,10 +35,6 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 # Shared demo password. Override with:  set BBI_ADMIN_PASS=your-password
 ADMIN_PASS = os.environ.get("BBI_ADMIN_PASS", "admin123")
-
-
-def _now():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 # --------------------------------------------------------------------------- #
@@ -211,7 +206,7 @@ def loan_decision(loan_id):
         db.execute(
             "UPDATE loans SET status = 'ACTIVE', outstanding_paise = principal_paise,"
             " decision_reason = ?, decided_at = ? WHERE id = ?",
-            ("Approved manually by bank admin.", _now(), loan_id),
+            ("Approved manually by bank admin.", now_str(), loan_id),
         )
         db.commit()
         flash(f"Loan {loan['loan_account']} ({fmt_inr(loan['principal_paise'])}) approved.",
@@ -220,7 +215,7 @@ def loan_decision(loan_id):
         db.execute(
             "UPDATE loans SET status = 'REJECTED', outstanding_paise = 0,"
             " decision_reason = ?, decided_at = ? WHERE id = ?",
-            ("Rejected manually by bank admin.", _now(), loan_id),
+            ("Rejected manually by bank admin.", now_str(), loan_id),
         )
         db.commit()
         flash(f"Loan {loan['loan_account']} rejected.", "info")

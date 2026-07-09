@@ -113,6 +113,7 @@ def close_db(exception=None):
 
 def init_db():
     db = sqlite3.connect(DB_FILE)
+    db.execute("PRAGMA foreign_keys = ON")   # enforce FK constraints (POLISH)
     db.executescript(
         """
         CREATE TABLE IF NOT EXISTS users (
