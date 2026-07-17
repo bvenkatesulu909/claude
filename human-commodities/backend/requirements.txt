@@ -1,0 +1,10 @@
+Flask>=3.0
+flask-cors>=4.0
+
+# AI-agent framework (agents are built as LangGraph StateGraphs):
+langgraph>=1.0
+langchain-core>=1.0
+
+# Live Claude reasoning — optional. Without a key the agent graphs route to their
+# deterministic template node, so the platform still runs fully offline.
+langchain-anthropic>=1.0
