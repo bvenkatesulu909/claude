@@ -1,5 +1,6 @@
 Flask>=3.0
 flask-cors>=4.0
+waitress>=3.0        # production WSGI server (see wsgi.py / Dockerfile)
 
 # AI-agent framework (agents are built as LangGraph StateGraphs):
 langgraph>=1.0

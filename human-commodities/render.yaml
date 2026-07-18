@@ -1,0 +1,14 @@
+# One-click deploy on Render (https://render.com) — Blueprint config.
+# Render reads this file when you create a "New > Blueprint" from the GitHub repo.
+services:
+  - type: web
+    name: human-commodities
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      # Optional: paste an Anthropic key to enable live Claude reasoning.
+      # Without it, every agent runs its deterministic offline path.
+      - key: ANTHROPIC_API_KEY
+        sync: false
