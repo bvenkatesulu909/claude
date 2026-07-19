@@ -1,0 +1,18 @@
+# One-click deploy on Render (https://render.com) — Blueprint config.
+# In Render: New > Blueprint > pick this repo. Set the service Root Directory
+# to "defence-systems-console" if Render doesn't auto-detect this file there.
+services:
+  - type: web
+    name: defence-systems-console
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      # REQUIRED for the SENTINEL chat agent. Paste your OpenRouter key in the
+      # Render dashboard (sync:false keeps it out of the repo). Without it, the
+      # dashboard still works; only the chat panel is disabled.
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: tencent/hy3

@@ -32,11 +32,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(HERE, ".env"))
 set_tracing_disabled(True)
 
-API_KEY = os.environ["OPENROUTER_API_KEY"]
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 MODEL = os.getenv("OPENROUTER_MODEL", "tencent/hy3")
 
-client = AsyncOpenAI(base_url="https://openrouter.ai/api/v1", api_key=API_KEY)
-model = OpenAIChatCompletionsModel(model=MODEL, openai_client=client)
+# Model/agent are built only when a key is present, so the dashboard and health
+# check still boot on a fresh deploy before the secret is configured. The chat
+# endpoint reports clearly if the key is missing.
+client = None
+model = None
+if API_KEY:
+    client = AsyncOpenAI(base_url="https://openrouter.ai/api/v1", api_key=API_KEY)
+    model = OpenAIChatCompletionsModel(model=MODEL, openai_client=client)
 
 
 # ---------------------------------------------------------------------------
@@ -100,20 +106,22 @@ AGENT_INSTRUCTIONS = (
     "end with a one-line 'Recommendation:'."
 )
 
-agent = Agent(
-    name="SENTINEL",
-    instructions=AGENT_INSTRUCTIONS,
-    model=model,
-    tools=[
-        list_assets,
-        get_asset,
-        list_tracks,
-        threat_posture,
-        readiness_summary,
-        log_incident,
-        list_incidents,
-    ],
-)
+agent = None
+if model is not None:
+    agent = Agent(
+        name="SENTINEL",
+        instructions=AGENT_INSTRUCTIONS,
+        model=model,
+        tools=[
+            list_assets,
+            get_asset,
+            list_tracks,
+            threat_posture,
+            readiness_summary,
+            log_incident,
+            list_incidents,
+        ],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -130,6 +138,11 @@ data.init_db()
 @app.route("/")
 def index():
     return render_template("index.html", model=MODEL)
+
+
+@app.route("/api/health")
+def health():
+    return jsonify({"status": "ok", "agent": bool(agent), "model": MODEL})
 
 
 @app.route("/api/dashboard")
@@ -149,6 +162,8 @@ def dashboard():
 @app.route("/api/chat", methods=["POST"])
 def chat():
     """The single agent handles the message end-to-end (tool loop included)."""
+    if agent is None:
+        return jsonify({"error": "OPENROUTER_API_KEY not configured on the server."}), 503
     msg = (request.get_json(silent=True) or {}).get("message", "").strip()
     if not msg:
         return jsonify({"error": "empty message"}), 400
