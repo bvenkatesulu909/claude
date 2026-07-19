@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SENTINEL — Defence Ops Console</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1>SENTINEL</h1>
+        <p>Defence Systems Operations Console</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="sim">● SIMULATION — SYNTHETIC DATA</span>
+      <span class="model">agent: {{ model }}</span>
+      <span id="clock" class="clock">--:--:--</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- Threat posture -->
+    <section class="card posture">
+      <h2>Readiness Condition</h2>
+      <div id="postureCode" class="posture-code">—</div>
+      <div class="posture-stats">
+        <div><b id="thHigh">0</b><span>high</span></div>
+        <div><b id="thMed">0</b><span>medium</span></div>
+        <div><b id="thTotal">0</b><span>tracks</span></div>
+      </div>
+    </section>
+
+    <!-- Readiness by branch -->
+    <section class="card">
+      <h2>Force Readiness <span id="overall" class="pill">--%</span></h2>
+      <div id="branches" class="bars"></div>
+    </section>
+
+    <!-- Assets -->
+    <section class="card wide">
+      <h2>Order of Battle</h2>
+      <table id="assets"><thead><tr>
+        <th>ID</th><th>Unit</th><th>Branch</th><th>Type</th><th>Base</th><th>Ready</th>
+      </tr></thead><tbody></tbody></table>
+    </section>
+
+    <!-- Tracks -->
+    <section class="card wide">
+      <h2>Air/Surface Picture <span class="live">live</span></h2>
+      <table id="tracks"><thead><tr>
+        <th>Track</th><th>Class</th><th>Brg</th><th>Rng km</th><th>Alt m</th><th>Spd kn</th><th>Threat</th>
+      </tr></thead><tbody></tbody></table>
+    </section>
+
+    <!-- Agent chat -->
+    <section class="card chat">
+      <h2>SENTINEL Duty Officer</h2>
+      <div id="log" class="chatlog">
+        <div class="msg bot">SENTINEL online. Ask about readiness, tracks, or posture.
+        Try: <i>"What's our air-defence readiness and any high-threat tracks?"</i></div>
+      </div>
+      <form id="chatForm" class="chatbar">
+        <input id="chatInput" autocomplete="off"
+               placeholder="Message the duty officer…" />
+        <button id="sendBtn">Send</button>
+      </form>
+    </section>
+
+    <!-- Incidents -->
+    <section class="card">
+      <h2>Incident Log</h2>
+      <ul id="incidents" class="incidents"><li class="empty">No incidents.</li></ul>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
